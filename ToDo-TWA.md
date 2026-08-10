@@ -1,0 +1,79 @@
+# 📋 To-Do List Project Bot Film TWA (14 Hari)
+
+## 🔴 MINGGU 1: Fondasi Backend, Payment Gateway, & Frontend TWA
+
+### **Hari 1: Setup Project & Skema Database (Laravel + MySQL)**
+
+- [ ] Inisialisasi project Laravel baru & konfigurasi `.env` ke database MySQL.
+- [ ] Buat migration & model `users` (id, telegram_id, username, is_subscribed, expired_at, created_at, updated_at).
+- [ ] Buat migration & model `packages` (id, name, duration_days, price, is_active, created_at, updated_at).
+- [ ] Buat migration & model `movies` (id, title, description, cover_url, genre, telegram_file_id, is_active, created_at, updated_at).
+- [ ] Buat migration & model `transactions` (id, invoice_code, user_id, package_id, amount, status, qris_url, created_at, updated_at).
+- [ ] Buat migration & model `movie_requests` (id, user_id, movie_title, status, created_at, updated_at).
+- [ ] Jalankan `php artisan migrate` dan _seeding_ data awal paket langganan.
+
+### **Hari 2: Setup BotFather & Engine Bot Telegram**
+
+- [ ] Buat bot baru di `@BotFather` dan simpan **HTTP API Token** di `.env`.
+- [ ] Buat Channel Privat Telegram sebagai Gudang Film & tambahkan Bot sebagai Admin.
+- [ ] Ambil `Chat ID` dari Channel Privat Telegram.
+- [ ] Set Webhook Telegram mengarah ke route Laravel `/api/telegram/webhook`.
+- [ ] Buat Telegram Controller untuk menangani Command `/start` dan `/status`.
+- [ ] Uji respons bot di Telegram saat di-ping perintah `/start`.
+
+### **Hari 3–4: Integrasi Webkus Payment Gateway & Webhook Callback**
+
+- [ ] Buat `PaymentController` untuk request QRIS Dinamis ke API Webkus.
+- [ ] Buat endpoint API `/api/webkus/callback` di Laravel untuk menerima notifikasi status transaksi.
+- [ ] Implementasikan logika penanganan transaksi sukses:
+  - [ ] Ubah status transaksi menjadi `SUCCESS`.
+  - [ ] Update status user menjadi `is_subscribed = true`.
+  - [ ] Tambahkan durasi langganan pada `expired_at` (misal: +30 hari).
+  - [ ] Kirim notifikasi konfirmasi pembayaran otomatis via Telegram Bot ke user.
+- [ ] Uji alur callback menggunakan mock/payload tes dari Webkus.
+
+### **Hari 5–7: Frontend TWA (Katalog, Checkout, & Request)**
+
+- [ ] Buat struktur HTML & styling (Tailwind CSS) untuk UI Telegram Web App (TWA).
+- [ ] Pasang SDK Telegram Web App `<script src="https://telegram.org/js/telegram-web-app.js"></script>` di `<head>`.
+- [ ] Buat halaman **Katalog Film** (Grid poster film, search, & filter genre).
+- [ ] Buat **Modal Detail Film** (Sinopsis & Tombol "Tonton Sekarang").
+- [ ] Buat halaman/modal **Pilihan Paket Langganan & Display QRIS Webkus**.
+- [ ] Buat halaman/form **Request Film Baru**.
+- [ ] Deploy kode frontend TWA ke Vercel (dapatkan URL HTTPS).
+
+---
+
+## 🔵 MINGGU 2: Integrasi System, Proteksi Media, Testing, & Launching
+
+### **Hari 8–9: Integrasi TWA ⇄ API Laravel**
+
+- [ ] Hubungkan UI Vercel ke API Laravel menggunakan `fetch` / `axios`.
+- [ ] Implementasikan verifikasi hash `initData` Telegram di Middleware Laravel agar API aman dari luar.
+- [ ] Hubungkan komponen Katalog TWA dengan API GET `/api/movies`.
+- [ ] Hubungkan tombol Checkout di TWA dengan API POST `/api/transactions/create`.
+- [ ] Buat logika validasi di TWA:
+  - [ ] Jika status user **Aktif** ──► panggil API untuk memicu bot mengirimkan video film.
+  - [ ] Jika status user **Tidak Aktif** ──► munculkan modal pembayaran QRIS Webkus.
+
+### **Hari 10–11: Sistem Gudang Film (`file_id`) & Proteksi Media**
+
+- [ ] Admin mengunggah berkas film ke Channel Privat Telegram untuk mendapatkan `file_id`.
+- [ ] Input data film beserta `telegram_file_id` ke database MySQL.
+- [ ] Implementasikan API pengiriman video film via Telegram API `sendVideo` di Laravel.
+- [ ] **Proteksi Media**: Pastikan parameter `protect_content => true` aktif saat pengiriman video agar pengguna tidak dapat men-download, merekam layar, atau membagikan (_forward_) video.
+
+### **Hari 12–13: Testing Ketat (End-to-End Test)**
+
+- [ ] Uji alur pembuka TWA dari dalam aplikasi Telegram versi Android & iOS.
+- [ ] Uji alur transaksi nyata: Klik Paket ──► Scan QRIS Webkus ──► Callback sukses ──► Status berubah otomatis.
+- [ ] Uji fitur tombol "Tonton Sekarang": Pastikan bot langsung mengirimkan video ke _chat privat_ user setelah diklik dari TWA.
+- [ ] Uji proteksi konten: Pastikan media video terikat aturan `protect_content`.
+- [ ] Uji alur input Request Film di TWA dan verifikasi data masuk ke database.
+
+### **Hari 14: Final Setup & GO LIVE! 🚀**
+
+- [ ] Mendaftarkan URL Vercel sebagai **Menu Button TWA** di `@BotFather` (perintah `/setmenubutton`).
+- [ ] Pastikan server Laravel, SSL/HTTPS, database MySQL, dan Webhook Webkus berjalan stabil.
+- [ ] Lakukan _final sanity check_ seluruh fitur.
+- [ ] **BOT FILM TWA RESMI LAUNCHING & SIAP DIPROMOSIKAN!**
