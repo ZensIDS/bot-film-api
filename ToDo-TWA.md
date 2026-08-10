@@ -15,6 +15,11 @@
 ### **Hari 2: Setup BotFather & Engine Bot Telegram**
 
 - [ ] Buat bot baru di `@BotFather` dan simpan **HTTP API Token** di `.env`.
+      BOT API KEY TOKEN -> "8730035543:AAESTop3tcM0NcsYU0vEHkbc43lGo29oPQo"
+      BOT NAME -> "NiceDramaBot"
+      BOT USERNAME -> "nice_drama_bot"
+      PIVATE CHANNEL NAME -> "Nice Drama"
+      TELEGRAM_CHANNEL_ID -> "-1004416422447"
 - [ ] Buat Channel Privat Telegram sebagai Gudang Film & tambahkan Bot sebagai Admin.
 - [ ] Ambil `Chat ID` dari Channel Privat Telegram.
 - [ ] Set Webhook Telegram mengarah ke route Laravel `/api/telegram/webhook`.
@@ -26,10 +31,10 @@
 - [ ] Buat `PaymentController` untuk request QRIS Dinamis ke API Webkus.
 - [ ] Buat endpoint API `/api/webkus/callback` di Laravel untuk menerima notifikasi status transaksi.
 - [ ] Implementasikan logika penanganan transaksi sukses:
-  - [ ] Ubah status transaksi menjadi `SUCCESS`.
-  - [ ] Update status user menjadi `is_subscribed = true`.
-  - [ ] Tambahkan durasi langganan pada `expired_at` (misal: +30 hari).
-  - [ ] Kirim notifikasi konfirmasi pembayaran otomatis via Telegram Bot ke user.
+    - [ ] Ubah status transaksi menjadi `SUCCESS`.
+    - [ ] Update status user menjadi `is_subscribed = true`.
+    - [ ] Tambahkan durasi langganan pada `expired_at` (misal: +30 hari).
+    - [ ] Kirim notifikasi konfirmasi pembayaran otomatis via Telegram Bot ke user.
 - [ ] Uji alur callback menggunakan mock/payload tes dari Webkus.
 
 ### **Hari 5–7: Frontend TWA (Katalog, Checkout, & Request)**
@@ -53,8 +58,8 @@
 - [ ] Hubungkan komponen Katalog TWA dengan API GET `/api/movies`.
 - [ ] Hubungkan tombol Checkout di TWA dengan API POST `/api/transactions/create`.
 - [ ] Buat logika validasi di TWA:
-  - [ ] Jika status user **Aktif** ──► panggil API untuk memicu bot mengirimkan video film.
-  - [ ] Jika status user **Tidak Aktif** ──► munculkan modal pembayaran QRIS Webkus.
+    - [ ] Jika status user **Aktif** ──► panggil API untuk memicu bot mengirimkan video film.
+    - [ ] Jika status user **Tidak Aktif** ──► munculkan modal pembayaran QRIS Webkus.
 
 ### **Hari 10–11: Sistem Gudang Film (`file_id`) & Proteksi Media**
 
