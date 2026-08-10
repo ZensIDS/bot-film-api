@@ -13,13 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('movies', function (Blueprint $table) {
             $table->id();
-            $table->string('telegram_id')->unique();
-            $table->string('username')->nullable();
-            $table->string('first_name')->nullable();
-            $table->boolean('is_subscribed')->default(false);
-            $table->timestamp('expired_at')->nullable();
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->string('cover_url')->nullable();
+            $table->string('genre')->nullable();
+            $table->string('telegram_file_id'); // ID berkas dari Telegram Channel Privat
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
@@ -31,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('movies');
     }
 };
