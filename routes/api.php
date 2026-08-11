@@ -46,6 +46,9 @@ Route::get('/packages/{package}', function (Package $package) {
 // Request judul film baru (hanya untuk user yang berlangganan aktif)
 Route::post('/movie-requests', [MovieRequestController::class, 'store']);
 
+// Riwayat request film milik user
+Route::get('/movie-requests', [MovieRequestController::class, 'index']);
+
 // Integration TWA
 Route::get('/user/status', function (Request $request) {
     $telegramId = $request->query('telegram_id');

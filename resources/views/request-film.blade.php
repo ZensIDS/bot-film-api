@@ -69,6 +69,17 @@
         }
 
         @media (prefers-reduced-motion: reduce){ .skel{ animation: none !important; } }
+
+        .status-badge{
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+        .status-pending{ background: rgba(232,177,86,0.15); color: var(--gold-soft); border: 1px solid rgba(232,177,86,0.3); }
+        .status-approved{ background: rgba(74,222,128,0.15); color: #4ADE80; border: 1px solid rgba(74,222,128,0.3); }
+        .status-rejected{ background: rgba(194,53,90,0.15); color: #F27C97; border: 1px solid rgba(194,53,90,0.3); }
     </style>
 </head>
 <body class="min-h-screen pb-10">
@@ -147,6 +158,14 @@
 
                 <p id="form-message" class="hidden text-xs text-center mt-1"></p>
             </form>
+
+            <!-- Riwayat Request -->
+            <div class="mt-8">
+                <h2 class="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-3">Riwayat Request</h2>
+                <div id="history-list" class="space-y-2.5">
+                    <!-- diisi oleh JS -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -182,6 +201,69 @@
         }
     }
 
+    const statusMap = {
+        PENDING: { label: 'Menunggu', cls: 'status-pending' },
+        APPROVED: { label: 'Disetujui', cls: 'status-approved' },
+        REJECTED: { label: 'Ditolak', cls: 'status-rejected' },
+    };
+
+    function formatDate(dateStr){
+        try {
+            return new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        } catch (e) {
+            return dateStr;
+        }
+    }
+
+    function renderHistory(items){
+        const list = document.getElementById('history-list');
+
+        if (!items.length) {
+            list.innerHTML = `
+                <div class="text-center py-6 border border-dashed border-[var(--hairline)] rounded-xl">
+                    <div class="text-2xl mb-1.5">📭</div>
+                    <p class="text-xs text-[var(--text-muted)]">Kamu belum pernah melakukan request film.</p>
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML = items.map(item => {
+            const status = statusMap[item.status] || statusMap.PENDING;
+            return `
+                <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-xl p-3.5 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold text-[var(--text)] truncate">${item.movie_title}</p>
+                        <p class="text-[11px] text-[var(--text-muted)] mt-0.5">${item.source} • ${formatDate(item.created_at)}</p>
+                    </div>
+                    <span class="status-badge ${status.cls} shrink-0">${status.label}</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function loadHistory(){
+        const list = document.getElementById('history-list');
+        list.innerHTML = `
+            <div class="h-14 rounded-xl skel"></div>
+            <div class="h-14 rounded-xl skel"></div>
+        `;
+
+        try {
+            const res = await fetch(`/api/movie-requests?telegram_id=${tgUser.id}`);
+            const result = await res.json();
+
+            if (!res.ok) {
+                throw new Error(result.message || `HTTP ${res.status}`);
+            }
+
+            renderHistory(result.data || []);
+        } catch (err) {
+            console.error('Gagal memuat riwayat request:', err);
+            list.innerHTML = `<p class="text-xs text-[var(--crimson)] text-center py-4">Gagal memuat riwayat. Coba refresh halaman ini.</p>`;
+        }
+    }
+
     async function handleSubmit(e){
         e.preventDefault();
 
@@ -202,7 +284,7 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({
-                    telegram_id: tgUser?.id,
+                    telegram_id: String(tgUser?.id),
                     movie_title: movieTitle,
                     source: movieSource,
                 })
@@ -219,6 +301,7 @@
             messageEl.classList.remove('hidden');
             document.getElementById('request-form').reset();
             tg.showAlert('Request film berhasil dikirim, terima kasih!');
+            loadHistory();
         } catch (err) {
             messageEl.textContent = err.message || 'Terjadi kesalahan, coba lagi nanti.';
             messageEl.className = 'text-xs text-center mt-1 text-[var(--crimson)]';
@@ -243,6 +326,7 @@
 
             applySubscriptionState();
             showState('page-content');
+            loadHistory();
 
             document.getElementById('request-form').addEventListener('submit', handleSubmit);
         } catch (err) {
