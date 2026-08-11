@@ -35,7 +35,7 @@ class PaymentController extends Controller
         ]);
 
         $user = User::where('telegram_id', (string)$request->telegram_id)->firstOrFail();
-        $package = Package::findOrFail($request->package_id);
+        $package = Package::where('is_active', true)->findOrFail($request->package_id);
 
         $orderId = 'INV-' . strtoupper(Str::random(6)) . '-' . time();
 
@@ -67,15 +67,18 @@ class PaymentController extends Controller
         ];
 
         try {
-            $paymentUrl = Snap::createTransaction($params)->redirect_url;
-            $transaction->update(['qris_url' => $paymentUrl]);
+            $snapTransaction = Snap::createTransaction($params);
+            // redirect_url disimpan sebagai fallback (mis. untuk dicek manual di admin),
+            // tapi pembayaran utamanya dilakukan lewat snap_token yang di-embed di halaman checkout.
+            $transaction->update(['qris_url' => $snapTransaction->redirect_url]);
 
             return response()->json([
                 'status' => 'success',
                 'data' => [
                     'order_id' => $orderId,
                     'amount' => $package->price,
-                    'payment_url' => $paymentUrl,
+                    'snap_token' => $snapTransaction->token,
+                    'payment_url' => $snapTransaction->redirect_url,
                 ]
             ]);
         } catch (\Exception $e) {

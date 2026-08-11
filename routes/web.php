@@ -16,3 +16,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// TWA View - Halaman utama Mini App
+Route::get('/app', function () {
+    return view('app');
+});
+
+// TWA View - Halaman checkout terpisah, agar mudah dicek terlepas dari halaman utama
+Route::get('/checkout', function () {
+    return view('checkout');
+});

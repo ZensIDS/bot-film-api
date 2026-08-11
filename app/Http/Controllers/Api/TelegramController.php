@@ -45,7 +45,7 @@ class TelegramController extends Controller
                 // Jika user memilih paket langganan tertentu (buy_package_{id})
                 elseif (str_starts_with($callbackData, 'buy_package_')) {
                     $packageId = str_replace('buy_package_', '', $callbackData);
-                    $this->processPaymentRequest($chatId, $packageId);
+                    $this->sendCheckoutLink($chatId, $packageId);
                 }
             }
 
@@ -74,7 +74,7 @@ class TelegramController extends Controller
                         . "Nikmati akses streaming berbagai drama & film eksklusif pilihan.\n\n"
                         . "Silakan pilih menu di bawah ini untuk memulai:";
 
-                    $webAppUrl = "https://7cf4-2404-8000-1041-162-3d91-db2d-a401-fda8.ngrok-free.app/app";
+                    $webAppUrl = rtrim(config('services.telegram.webapp_url'), '/') . '/app';
 
                     $keyboard = [
                         'inline_keyboard' => [
@@ -135,38 +135,35 @@ class TelegramController extends Controller
         $this->sendMessageWithKeyboard($chatId, "🍿 *PILIH PAKET LANGGANAN*\n\nSilahkan pilih paket langganan yang kamu inginkan:", ['inline_keyboard' => $keyboard]);
     }
 
-    private function processPaymentRequest($chatId, $packageId)
+    /**
+     * Kirim tombol Web App yang membuka halaman /checkout di dalam TWA.
+     * Transaksi Midtrans dibuat & dibayar sepenuhnya di dalam TWA, bukan dari bot.
+     */
+    private function sendCheckoutLink($chatId, $packageId)
     {
-        $paymentRequest = new Request([
-            'telegram_id' => $chatId,
-            'package_id' => $packageId,
-        ]);
+        $package = Package::where('is_active', true)->find($packageId);
 
-        $paymentController = new PaymentController();
-        $response = $paymentController->createTransaction($paymentRequest);
-        $responseData = json_decode($response->getContent(), true);
-
-        if (isset($responseData['status']) && $responseData['status'] === 'success') {
-            $paymentUrl = $responseData['data']['payment_url'];
-            $amount = number_format($responseData['data']['amount'], 0, ',', '.');
-
-            $text = "💳 *TAGIHAN PEMBAYARAN MIDTRANS*\n\n"
-                . "Order ID: `{$responseData['data']['order_id']}`\n"
-                . "Total Bayar: *Rp {$amount}*\n\n"
-                . "Silakan klik tombol di bawah ini untuk membayar via *QRIS (GoPay/ShopeePay/OVO/DANA), Transfer Bank, dll.*";
-
-            $keyboard = [
-                'inline_keyboard' => [
-                    [
-                        ['text' => '🚀 Bayar Sekarang via Midtrans', 'url' => $paymentUrl]
-                    ]
-                ]
-            ];
-
-            $this->sendMessageWithKeyboard($chatId, $text, $keyboard);
-        } else {
-            $this->sendMessage($chatId, "❌ Gagal membuat transaksi pembayaran. Silakan coba lagi.");
+        if (!$package) {
+            $this->sendMessage($chatId, "⚠️ Paket tidak ditemukan atau sudah tidak tersedia.");
+            return;
         }
+
+        $priceFormatted = number_format($package->price, 0, ',', '.');
+        $checkoutUrl = rtrim(config('services.telegram.webapp_url'), '/') . '/checkout?package_id=' . $package->id;
+
+        $text = "🛒 *{$package->name}*\n"
+            . "Rp {$priceFormatted} • {$package->duration_days} Hari\n\n"
+            . "Tekan tombol di bawah untuk menyelesaikan pembayaran langsung di dalam aplikasi.";
+
+        $keyboard = [
+            'inline_keyboard' => [
+                [
+                    ['text' => '🚀 Lanjut ke Pembayaran', 'web_app' => ['url' => $checkoutUrl]]
+                ]
+            ]
+        ];
+
+        $this->sendMessageWithKeyboard($chatId, $text, $keyboard);
     }
 
     private function sendMessage($chatId, $text)
