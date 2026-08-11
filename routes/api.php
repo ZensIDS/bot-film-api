@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\PaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TelegramController;
@@ -20,3 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/telegram/webhook', [TelegramController::class, 'handleWebhook']);
+Route::post('/payment/create', [PaymentController::class, 'createTransaction']);
+Route::post('/payment/callback', [PaymentController::class, 'handleCallback']);
