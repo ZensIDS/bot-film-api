@@ -4,38 +4,38 @@
 
 ### **Hari 1: Setup Project & Skema Database (Laravel + MySQL)**
 
-- [ ] Inisialisasi project Laravel baru & konfigurasi `.env` ke database MySQL.
-- [ ] Buat migration & model `users` (id, telegram_id, username, is_subscribed, expired_at, created_at, updated_at).
-- [ ] Buat migration & model `packages` (id, name, duration_days, price, is_active, created_at, updated_at).
-- [ ] Buat migration & model `movies` (id, title, description, cover_url, genre, telegram_file_id, is_active, created_at, updated_at).
-- [ ] Buat migration & model `transactions` (id, invoice_code, user_id, package_id, amount, status, qris_url, created_at, updated_at).
-- [ ] Buat migration & model `movie_requests` (id, user_id, movie_title, status, created_at, updated_at).
-- [ ] Jalankan `php artisan migrate` dan _seeding_ data awal paket langganan.
+- [x] Inisialisasi project Laravel baru & konfigurasi `.env` ke database MySQL.
+- [x] Buat migration & model `users` (id, telegram_id, username, is_subscribed, expired_at, created_at, updated_at).
+- [x] Buat migration & model `packages` (id, name, duration_days, price, is_active, created_at, updated_at).
+- [x] Buat migration & model `movies` (id, title, description, cover_url, genre, telegram_file_id, is_active, created_at, updated_at).
+- [x] Buat migration & model `transactions` (id, invoice_code, user_id, package_id, amount, status, qris_url, created_at, updated_at).
+- [x] Buat migration & model `movie_requests` (id, user_id, movie_title, status, created_at, updated_at).
+- [x] Jalankan `php artisan migrate` dan _seeding_ data awal paket langganan.
 
 ### **Hari 2: Setup BotFather & Engine Bot Telegram**
 
-- [ ] Buat bot baru di `@BotFather` dan simpan **HTTP API Token** di `.env`.
+- [x] Buat bot baru di `@BotFather` dan simpan **HTTP API Token** di `.env`.
       BOT API KEY TOKEN -> "8730035543:AAESTop3tcM0NcsYU0vEHkbc43lGo29oPQo"
       BOT NAME -> "NiceDramaBot"
       BOT USERNAME -> "nice_drama_bot"
       PIVATE CHANNEL NAME -> "Nice Drama"
       TELEGRAM_CHANNEL_ID -> "-1004416422447"
-- [ ] Buat Channel Privat Telegram sebagai Gudang Film & tambahkan Bot sebagai Admin.
-- [ ] Ambil `Chat ID` dari Channel Privat Telegram.
-- [ ] Set Webhook Telegram mengarah ke route Laravel `/api/telegram/webhook`.
-- [ ] Buat Telegram Controller untuk menangani Command `/start` dan `/status`.
-- [ ] Uji respons bot di Telegram saat di-ping perintah `/start`.
+- [x] Buat Channel Privat Telegram sebagai Gudang Film & tambahkan Bot sebagai Admin.
+- [x] Ambil `Chat ID` dari Channel Privat Telegram.
+- [x] Set Webhook Telegram mengarah ke route Laravel `/api/telegram/webhook`.
+- [x] Buat Telegram Controller untuk menangani Command `/start` dan `/status`.
+- [x] Uji respons bot di Telegram saat di-ping perintah `/start`.
 
-### **Hari 3–4: Integrasi Webkus Payment Gateway & Webhook Callback**
+### **Hari 3–4: Integrasi Midtrans Payment Gateway & Webhook Callback**
 
-- [ ] Buat `PaymentController` untuk request QRIS Dinamis ke API Webkus.
-- [ ] Buat endpoint API `/api/webkus/callback` di Laravel untuk menerima notifikasi status transaksi.
+- [x] Buat `PaymentController` untuk request QRIS Dinamis ke API Webkus.
+- [x] Buat endpoint API `/api/webkus/callback` di Laravel untuk menerima notifikasi status transaksi.
 - [ ] Implementasikan logika penanganan transaksi sukses:
-    - [ ] Ubah status transaksi menjadi `SUCCESS`.
-    - [ ] Update status user menjadi `is_subscribed = true`.
-    - [ ] Tambahkan durasi langganan pada `expired_at` (misal: +30 hari).
-    - [ ] Kirim notifikasi konfirmasi pembayaran otomatis via Telegram Bot ke user.
-- [ ] Uji alur callback menggunakan mock/payload tes dari Webkus.
+    - [x] Ubah status transaksi menjadi `SUCCESS`.
+    - [x] Update status user menjadi `is_subscribed = true`.
+    - [x] Tambahkan durasi langganan pada `expired_at` (misal: +30 hari).
+    - [x] Kirim notifikasi konfirmasi pembayaran otomatis via Telegram Bot ke user.
+- [x] Uji alur callback menggunakan mock/payload tes dari Midtrans.
 
 ### **Hari 5–7: Frontend TWA (Katalog, Checkout, & Request)**
 

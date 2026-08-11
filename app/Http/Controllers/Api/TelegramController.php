@@ -13,70 +13,105 @@ class TelegramController extends Controller
 {
     public function handleWebhook(Request $request)
     {
-        $update = $request->all();
+        try {
+            $update = $request->all();
+            Log::info('Telegram Update Received:', $update);
 
-        // Log incoming update for debugging
-        Log::info('Telegram Update:', $update);
+            // 1. Handling Callback Query (Klik Tombol Inline)
+            if (isset($update['callback_query'])) {
+                $callbackQuery = $update['callback_query'];
+                $callbackQueryId = $callbackQuery['id'];
+                $chatId = $callbackQuery['message']['chat']['id'];
+                $callbackData = $callbackQuery['data'] ?? '';
 
-        // 1. Handling Pesan Teks Normal / Command
-        if (isset($update['message'])) {
-            $message = $update['message'];
-            $chatId = $message['chat']['id'];
-            $text = $message['text'] ?? '';
-            $username = $message['from']['username'] ?? null;
-            $firstName = $message['from']['first_name'] ?? 'User';
+                // Hilangkan indikator loading di tombol Telegram secara instan
+                $this->answerCallbackQuery($callbackQueryId);
 
-            // Simpan / Update User ke Database MySQL
-            $user = User::firstOrCreate(
-                ['telegram_id' => $chatId],
-                [
-                    'username' => $username,
-                    'first_name' => $firstName,
-                    'is_subscribed' => false,
-                ]
-            );
+                // Jika user klik tombol Status Langganan
+                if ($callbackData === 'check_status') {
+                    $user = User::where('telegram_id', $chatId)->first();
+                    $statusText = ($user && $user->is_subscribed && $user->expired_at && $user->expired_at->isFuture())
+                        ? "✅ Status Langganan: *AKTIF*\nExpired: " . $user->expired_at->format('d M Y H:i') . " WIB"
+                        : "❌ Status Langganan: *TIDAK AKTIF*\nSilakan pilih paket langganan terlebih dahulu.";
 
-            // Command /start
-            if (str_starts_with($text, '/start')) {
-                $replyText = "Halo {$firstName}! 👋\n\nSelamat datang di Bot Streaming Film.\nBuka katalog film eksklusif dan tonton langsung melalui tombol di bawah ini!";
+                    $this->sendMessage($chatId, $statusText);
+                }
 
-                $this->sendMessage($chatId, $replyText);
+                // Jika user klik tombol Pilihan Paket
+                elseif ($callbackData === 'view_packages') {
+                    $this->sendPackageList($chatId);
+                }
+
+                // Jika user memilih paket langganan tertentu (buy_package_{id})
+                elseif (str_starts_with($callbackData, 'buy_package_')) {
+                    $packageId = str_replace('buy_package_', '', $callbackData);
+                    $this->processPaymentRequest($chatId, $packageId);
+                }
             }
 
-            // Command /status
-            elseif ($text === '/status') {
-                $statusText = $user->is_subscribed && $user->expired_at && $user->expired_at->isFuture()
-                    ? "✅ Status Langganan: *AKTIF*\nExpired: " . $user->expired_at->format('d M Y H:i')
-                    : "❌ Status Langganan: *TIDAK AKTIF*\nSilakan beli paket langganan terlebih dahulu.";
+            // 2. Handling Pesan Teks Normal / Command (/start, /status, /paket)
+            elseif (isset($update['message'])) {
+                $message = $update['message'];
+                $chatId = $message['chat']['id'];
+                $text = $message['text'] ?? '';
+                $username = $message['from']['username'] ?? null;
+                $firstName = $message['from']['first_name'] ?? 'User';
 
-                $this->sendMessage($chatId, $statusText);
+                // Simpan / Update User ke Database MySQL
+                $user = User::firstOrCreate(
+                    ['telegram_id' => $chatId],
+                    [
+                        'username' => $username,
+                        'first_name' => $firstName,
+                        'is_subscribed' => false,
+                    ]
+                );
+
+                // Command /start
+                if (str_starts_with($text, '/start')) {
+                    $replyText = "Halo {$firstName}! 👋\n\n"
+                        . "Selamat datang di **NiceDramaBot**! 🍿\n"
+                        . "Nikmati akses streaming berbagai drama & film eksklusif pilihan.\n\n"
+                        . "Silakan pilih menu di bawah ini untuk memulai:";
+
+                    $webAppUrl = "https://7cf4-2404-8000-1041-162-3d91-db2d-a401-fda8.ngrok-free.app/app";
+
+                    $keyboard = [
+                        'inline_keyboard' => [
+                            [
+                                ['text' => '🎬 Ruang Drama', 'web_app' => ['url' => $webAppUrl]]
+                            ],
+                            [
+                                ['text' => '📊 Status Langganan', 'callback_data' => 'check_status'],
+                                ['text' => '💎 Pilihan Paket', 'callback_data' => 'view_packages']
+                            ]
+                        ]
+                    ];
+
+                    $this->sendMessageWithKeyboard($chatId, $replyText, $keyboard);
+                }
+
+                // Command /status
+                elseif ($text === '/status') {
+                    $statusText = $user->is_subscribed && $user->expired_at && $user->expired_at->isFuture()
+                        ? "✅ Status Langganan: *AKTIF*\nExpired: " . $user->expired_at->format('d M Y H:i') . " WIB"
+                        : "❌ Status Langganan: *TIDAK AKTIF*\nSilakan beli paket langganan terlebih dahulu.";
+
+                    $this->sendMessage($chatId, $statusText);
+                }
+
+                // Command /paket atau /buy
+                elseif ($text === '/paket' || $text === '/buy') {
+                    $this->sendPackageList($chatId);
+                }
             }
-
-            // Command /paket (Untuk Menampilkan Daftar Paket)
-            elseif ($text === '/paket' || $text === '/buy') {
-                $this->sendPackageList($chatId);
-            }
-        }
-
-        // 2. Handling Klik Tombol Inline (Callback Query)
-        if (isset($update['callback_query'])) {
-            $callbackQuery = $update['callback_query'];
-            $chatId = $callbackQuery['message']['chat']['id'];
-            $callbackData = $callbackQuery['data'];
-
-            // Jika user memilih paket langganan (Format data: buy_package_{id})
-            if (str_starts_with($callbackData, 'buy_package_')) {
-                $packageId = str_replace('buy_package_', '', $callbackData);
-                $this->processPaymentRequest($chatId, $packageId);
-            }
+        } catch (\Exception $e) {
+            Log::error('Telegram Controller Error: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
         }
 
         return response()->json(['status' => 'success'], 200);
     }
 
-    /**
-     * Menampilkan daftar paket langganan dengan Inline Keyboard Buttons
-     */
     private function sendPackageList($chatId)
     {
         $packages = Package::all();
@@ -97,21 +132,11 @@ class TelegramController extends Controller
             ];
         }
 
-        $token = env('TELEGRAM_BOT_TOKEN');
-        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
-            'chat_id' => $chatId,
-            'text' => "🍿 *PILIH PAKET LANGGANAN*\n\nSilahkan pilih paket langganan yang kamu inginkan:",
-            'parse_mode' => 'Markdown',
-            'reply_markup' => json_encode(['inline_keyboard' => $keyboard])
-        ]);
+        $this->sendMessageWithKeyboard($chatId, "🍿 *PILIH PAKET LANGGANAN*\n\nSilahkan pilih paket langganan yang kamu inginkan:", ['inline_keyboard' => $keyboard]);
     }
 
-    /**
-     * Memanggil PaymentController untuk membuat transaksi Midtrans dan mengirim tombol bayar
-     */
     private function processPaymentRequest($chatId, $packageId)
     {
-        // Panggil PaymentController internal
         $paymentRequest = new Request([
             'telegram_id' => $chatId,
             'package_id' => $packageId,
@@ -130,19 +155,15 @@ class TelegramController extends Controller
                 . "Total Bayar: *Rp {$amount}*\n\n"
                 . "Silakan klik tombol di bawah ini untuk membayar via *QRIS (GoPay/ShopeePay/OVO/DANA), Transfer Bank, dll.*";
 
-            $token = env('TELEGRAM_BOT_TOKEN');
-            Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
-                'chat_id' => $chatId,
-                'text' => $text,
-                'parse_mode' => 'Markdown',
-                'reply_markup' => json_encode([
-                    'inline_keyboard' => [
-                        [
-                            ['text' => '🚀 Bayar Sekarang via Midtrans', 'url' => $paymentUrl]
-                        ]
+            $keyboard = [
+                'inline_keyboard' => [
+                    [
+                        ['text' => '🚀 Bayar Sekarang via Midtrans', 'url' => $paymentUrl]
                     ]
-                ])
-            ]);
+                ]
+            ];
+
+            $this->sendMessageWithKeyboard($chatId, $text, $keyboard);
         } else {
             $this->sendMessage($chatId, "❌ Gagal membuat transaksi pembayaran. Silakan coba lagi.");
         }
@@ -151,16 +172,35 @@ class TelegramController extends Controller
     private function sendMessage($chatId, $text)
     {
         $token = env('TELEGRAM_BOT_TOKEN');
-
-        if (!$token) {
-            Log::error('TELEGRAM_BOT_TOKEN belum diatur di file .env');
-            return;
-        }
+        if (!$token) return;
 
         Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
             'chat_id' => $chatId,
             'text' => $text,
             'parse_mode' => 'Markdown',
+        ]);
+    }
+
+    private function sendMessageWithKeyboard($chatId, $text, array $keyboard)
+    {
+        $token = env('TELEGRAM_BOT_TOKEN');
+        if (!$token) return;
+
+        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+            'chat_id' => $chatId,
+            'text' => $text,
+            'parse_mode' => 'Markdown',
+            'reply_markup' => json_encode($keyboard)
+        ]);
+    }
+
+    private function answerCallbackQuery($callbackQueryId)
+    {
+        $token = env('TELEGRAM_BOT_TOKEN');
+        if (!$token) return;
+
+        Http::post("https://api.telegram.org/bot{$token}/answerCallbackQuery", [
+            'callback_query_id' => $callbackQueryId,
         ]);
     }
 }
