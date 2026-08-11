@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\PaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TelegramController;
+use App\Http\Controllers\Api\MovieRequestController;
 use App\Models\Package;
 use App\Models\User;
 
@@ -41,6 +42,9 @@ Route::get('/packages/{package}', function (Package $package) {
     }
     return response()->json($package);
 });
+
+// Request judul film baru (hanya untuk user yang berlangganan aktif)
+Route::post('/movie-requests', [MovieRequestController::class, 'store']);
 
 // Integration TWA
 Route::get('/user/status', function (Request $request) {

@@ -8,4 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class MovieRequest extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'movie_title',
+        'source',
+        'status',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

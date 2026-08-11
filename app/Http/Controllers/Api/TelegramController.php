@@ -69,8 +69,13 @@ class TelegramController extends Controller
 
                 // Command /start
                 if (str_starts_with($text, '/start')) {
+                    // NOTE: parse_mode yang dipakai di sendMessage() adalah 'Markdown' (versi lama),
+                    // bukan 'MarkdownV2'. Di mode lama, teks tebal HARUS pakai satu bintang (*teks*),
+                    // bukan dua (**teks**). Pemakaian ** sebelumnya membuat Telegram menolak seluruh
+                    // request sendMessage (error 400: can't parse entities), sehingga /start terlihat
+                    // seperti tidak membalas sama sekali.
                     $replyText = "Halo {$firstName}! 👋\n\n"
-                        . "Selamat datang di **NiceDramaBot**! 🍿\n"
+                        . "Selamat datang di *NiceDramaBot*! 🍿\n"
                         . "Nikmati akses streaming berbagai drama & film eksklusif pilihan.\n\n"
                         . "Silakan pilih menu di bawah ini untuk memulai:";
 
@@ -82,8 +87,7 @@ class TelegramController extends Controller
                                 ['text' => '🎬 Ruang Drama', 'web_app' => ['url' => $webAppUrl]]
                             ],
                             [
-                                ['text' => '📊 Status Langganan', 'callback_data' => 'check_status'],
-                                ['text' => '💎 Pilihan Paket', 'callback_data' => 'view_packages']
+                                ['text' => '📊 Status Langganan', 'callback_data' => 'check_status']
                             ]
                         ]
                     ];
@@ -169,26 +173,40 @@ class TelegramController extends Controller
     private function sendMessage($chatId, $text)
     {
         $token = env('TELEGRAM_BOT_TOKEN');
-        if (!$token) return;
+        if (!$token) {
+            Log::error('TELEGRAM_BOT_TOKEN belum diset di .env, sendMessage dibatalkan.');
+            return;
+        }
 
-        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+        $response = Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
             'chat_id' => $chatId,
             'text' => $text,
             'parse_mode' => 'Markdown',
         ]);
+
+        if ($response->failed()) {
+            Log::error('Telegram sendMessage gagal: ' . $response->body());
+        }
     }
 
     private function sendMessageWithKeyboard($chatId, $text, array $keyboard)
     {
         $token = env('TELEGRAM_BOT_TOKEN');
-        if (!$token) return;
+        if (!$token) {
+            Log::error('TELEGRAM_BOT_TOKEN belum diset di .env, sendMessageWithKeyboard dibatalkan.');
+            return;
+        }
 
-        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+        $response = Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
             'chat_id' => $chatId,
             'text' => $text,
             'parse_mode' => 'Markdown',
             'reply_markup' => json_encode($keyboard)
         ]);
+
+        if ($response->failed()) {
+            Log::error('Telegram sendMessageWithKeyboard gagal: ' . $response->body());
+        }
     }
 
     private function answerCallbackQuery($callbackQueryId)
@@ -196,8 +214,12 @@ class TelegramController extends Controller
         $token = env('TELEGRAM_BOT_TOKEN');
         if (!$token) return;
 
-        Http::post("https://api.telegram.org/bot{$token}/answerCallbackQuery", [
+        $response = Http::post("https://api.telegram.org/bot{$token}/answerCallbackQuery", [
             'callback_query_id' => $callbackQueryId,
         ]);
+
+        if ($response->failed()) {
+            Log::error('Telegram answerCallbackQuery gagal: ' . $response->body());
+        }
     }
 }

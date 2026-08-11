@@ -17,12 +17,22 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// TWA View - Halaman utama Mini App
+// TWA View - MiniApp
 Route::get('/app', function () {
     return view('app');
 });
 
-// TWA View - Halaman checkout terpisah, agar mudah dicek terlepas dari halaman utama
+// TWA View - Checkout Page
 Route::get('/checkout', function () {
     return view('checkout');
+});
+
+// TWA View - Halaman detail film
+Route::get('/movie/{id}', function ($id) {
+    return view('movie-detail', ['id' => $id]);
+});
+
+// TWA View - Halaman request judul film (khusus pelanggan aktif)
+Route::get('/request-film', function () {
+    return view('request-film');
 });

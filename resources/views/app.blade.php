@@ -217,6 +217,16 @@
                         <span id="vip-badge-home" class="badge-vip text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap mt-1 relative z-10">VIP AKTIF</span>
                     </div>
 
+                    <!-- Banner Promo: Request Film -->
+                    <button onclick="window.location.href='/request-film'" class="w-full flex items-center gap-3 mb-4 rounded-xl p-3.5 text-left bg-gradient-to-r from-[var(--surface-2)] to-[var(--surface)] border border-[var(--gold)]/40 active:scale-[0.98] transition">
+                        <span class="w-9 h-9 rounded-full bg-[var(--gold)]/15 flex items-center justify-center text-lg shrink-0">🎬</span>
+                        <span class="flex-1 min-w-0">
+                            <span class="block text-xs font-bold text-[var(--gold-soft)]">Tidak nemu judulnya?</span>
+                            <span class="block text-[11px] text-[var(--text-muted)]">Request film favoritmu di sini</span>
+                        </span>
+                        <span class="text-[var(--gold)] text-sm shrink-0">→</span>
+                    </button>
+
                     <!-- Search Box & Filter Genre -->
                     <div class="space-y-3 mb-6">
                         <div class="relative">
@@ -319,6 +329,12 @@
                 </svg>
                 Paket
             </button>
+            <button onclick="window.location.href='/request-film'" id="nav-request" class="nav-tab flex flex-col items-center gap-1 text-[10px] font-medium text-[var(--text-muted)] transition">
+                <svg class="w-5 h-5 stroke-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Request
+            </button>
             <button onclick="switchTab('profile')" id="nav-profile" class="nav-tab flex flex-col items-center gap-1 text-[10px] font-medium text-[var(--text-muted)] transition">
                 <svg class="w-5 h-5 stroke-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -342,14 +358,19 @@
     tg.ready();
     tg.expand();
 
+    // TODO (Hari 8-9): ganti data statis ini dengan hasil fetch ke GET /api/movies
     const demoDramas = [
-        { title: "Cinta di Ujung Senja", episodes: 16, genre: "Romansa", cover: "https://picsum.photos/seed/drama1/300/400" },
-        { title: "Rahasia Kota Lama", episodes: 20, genre: "Misteri", cover: "https://picsum.photos/seed/drama2/300/400" },
-        { title: "Pewaris Takhta", episodes: 24, genre: "Drama Kerajaan", cover: "https://picsum.photos/seed/drama3/300/400" },
-        { title: "Jalan Pulang", episodes: 12, genre: "Keluarga", cover: "https://picsum.photos/seed/drama4/300/400" }
+        { id: 1, title: "Cinta di Ujung Senja", episodes: 16, genre: "Romansa", cover: "https://picsum.photos/seed/drama1/300/400", synopsis: "Setelah bertahun-tahun berpisah karena kesalahpahaman keluarga, Alya dan Raka dipertemukan kembali di sebuah kota kecil tepi pantai. Di antara senja yang sama, mereka harus memilih antara melanjutkan hidup masing-masing atau memberi cinta lama kesempatan kedua." },
+        { id: 2, title: "Rahasia Kota Lama", episodes: 20, genre: "Misteri", cover: "https://picsum.photos/seed/drama2/300/400", synopsis: "Seorang jurnalis muda kembali ke kota kelahirannya untuk menyelidiki kematian misterius kakeknya. Setiap petunjuk yang ia temukan justru membongkar rahasia kelam yang selama ini disembunyikan seluruh kota." },
+        { id: 3, title: "Pewaris Takhta", episodes: 24, genre: "Drama Kerajaan", cover: "https://picsum.photos/seed/drama3/300/400", synopsis: "Perebutan takhta antar saudara memaksa Putri Wulan menempuh jalan yang tak pernah ia bayangkan: menyamar sebagai rakyat biasa untuk mengungkap konspirasi di dalam istananya sendiri." },
+        { id: 4, title: "Jalan Pulang", episodes: 12, genre: "Keluarga", cover: "https://picsum.photos/seed/drama4/300/400", synopsis: "Setelah 15 tahun merantau, Dimas pulang ke desanya membawa satu rahasia besar. Kisah hangat tentang keluarga, pengampunan, dan arti sesungguhnya dari kata 'rumah'." }
     ];
 
     let currentGenre = 'Semua';
+
+    function goToMovie(id){
+        window.location.href = `/movie/${id}`;
+    }
 
     function renderDramaList(dramas){
         const list = document.getElementById('drama-list');
@@ -358,7 +379,7 @@
             return;
         }
         list.innerHTML = dramas.map(d => `
-            <div class="poster">
+            <div class="poster" onclick="goToMovie(${d.id})" role="button" tabindex="0">
                 <div class="poster__frame">
                     <img src="${d.cover}" alt="Poster ${d.title}" loading="lazy">
                     <span class="poster__badge">${d.genre}</span>
@@ -482,6 +503,11 @@
 
             renderDramaList(demoDramas);
             fetchPackages();
+
+            const requestedTab = new URLSearchParams(window.location.search).get('tab');
+            if (requestedTab === 'packages') {
+                switchTab('packages');
+            }
 
             if (result.is_subscribed) {
                 document.getElementById('vip-badge-home').classList.remove('hidden');

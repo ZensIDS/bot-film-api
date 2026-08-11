@@ -39,13 +39,12 @@
 
 ### **Hari 5–7: Frontend TWA (Katalog, Checkout, & Request)**
 
-- [ ] Buat struktur HTML & styling (Tailwind CSS) untuk UI Telegram Web App (TWA).
-- [ ] Pasang SDK Telegram Web App `<script src="https://telegram.org/js/telegram-web-app.js"></script>` di `<head>`.
-- [ ] Buat halaman **Katalog Film** (Grid poster film, search, & filter genre).
-- [ ] Buat **Modal Detail Film** (Sinopsis & Tombol "Tonton Sekarang").
-- [ ] Buat halaman/modal **Pilihan Paket Langganan & Display QRIS Webkus**.
+- [x] Buat struktur HTML & styling (Tailwind CSS) untuk UI Telegram Web App (TWA).
+- [x] Pasang SDK Telegram Web App `<script src="https://telegram.org/js/telegram-web-app.js"></script>` di `<head>`.
+- [x] Buat halaman/modal **Pilihan Paket Langganan & Payment InApp Midtrans**.
+- [x] Buat halaman **Katalog Film** (Grid poster film, search, & filter genre).
+- [ ] Buat **Halaman Detail Film** (Sinopsis & Tombol "Tonton Sekarang").
 - [ ] Buat halaman/form **Request Film Baru**.
-- [ ] Deploy kode frontend TWA ke Vercel (dapatkan URL HTTPS).
 
 ---
 
