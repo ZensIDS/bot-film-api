@@ -61,6 +61,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('movies/{movie}/episodes/{episode}', [\App\Http\Controllers\Admin\MovieController::class, 'updateEpisode'])->name('movies.episodes.update');
         Route::delete('movies/{movie}/episodes/{episode}', [\App\Http\Controllers\Admin\MovieController::class, 'destroyEpisode'])->name('movies.episodes.destroy');
 
+        // Manajemen Paket Langganan & Harga
+        Route::get('packages', [\App\Http\Controllers\Admin\PackageController::class, 'index'])->name('packages.index');
+        Route::post('packages', [\App\Http\Controllers\Admin\PackageController::class, 'store'])->name('packages.store');
+        Route::put('packages/{package}', [\App\Http\Controllers\Admin\PackageController::class, 'update'])->name('packages.update');
+        Route::post('packages/{package}/toggle-active', [\App\Http\Controllers\Admin\PackageController::class, 'toggleActive'])->name('packages.toggle-active');
+        Route::delete('packages/{package}', [\App\Http\Controllers\Admin\PackageController::class, 'destroy'])->name('packages.destroy');
+
         // Manajemen User & Langganan
         Route::get('users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
         Route::post('users/{user}/extend-vip', [\App\Http\Controllers\Admin\UserController::class, 'extendVip'])->name('users.extend-vip');
@@ -68,5 +75,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Riwayat Transaksi
         Route::get('transactions', [\App\Http\Controllers\Admin\TransactionController::class, 'index'])->name('transactions.index');
+        Route::post('transactions/withdraw', [\App\Http\Controllers\Admin\TransactionController::class, 'withdraw'])->name('transactions.withdraw');
     });
 });

@@ -32,21 +32,40 @@ class UserController extends Controller
                 }
             })
             ->latest()
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
-        return view('admin.users.index', compact('users'));
+        $recap = [
+            'total' => User::count(),
+            'active_vip' => User::where('is_subscribed', true)->where('expired_at', '>', now())->count(),
+            'expired' => User::where(function ($q) {
+                $q->where('is_subscribed', false)
+                    ->orWhere('expired_at', '<=', now())
+                    ->orWhereNull('expired_at');
+            })->count(),
+        ];
+
+        return view('admin.users.index', compact('users', 'recap'));
     }
 
     /**
      * Manual Extend VIP — dipakai admin buat nambah masa aktif user
      * (mis. komplain pembayaran, hadiah promo, dsb — di luar alur otomatis Midtrans).
+     * Durasi bisa diinput dalam satuan menit, jam, atau hari lewat popup di frontend.
      */
     public function extendVip(Request $request, User $user)
     {
         $data = $request->validate([
-            'days' => 'required|integer|min:1|max:365',
+            'amount' => 'required|integer|min:1|max:100000',
+            'unit' => 'required|in:minutes,hours,days',
         ]);
+
+        $minutesMap = [
+            'minutes' => 1,
+            'hours' => 60,
+            'days' => 60 * 24,
+        ];
+        $totalMinutes = $data['amount'] * $minutesMap[$data['unit']];
 
         $base = ($user->expired_at && $user->expired_at->isFuture())
             ? $user->expired_at
@@ -54,12 +73,18 @@ class UserController extends Controller
 
         $user->update([
             'is_subscribed' => true,
-            'expired_at' => $base->copy()->addDays($data['days']),
+            'expired_at' => $base->copy()->addMinutes($totalMinutes),
         ]);
+
+        $unitLabel = [
+            'minutes' => 'menit',
+            'hours' => 'jam',
+            'days' => 'hari',
+        ][$data['unit']];
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'VIP ' . ($user->first_name ?: $user->telegram_id) . ' berhasil diperpanjang ' . $data['days'] . ' hari, aktif hingga ' . $user->expired_at->format('d M Y H:i') . '.');
+            ->with('success', 'VIP ' . ($user->first_name ?: $user->telegram_id) . ' berhasil diperpanjang ' . $data['amount'] . ' ' . $unitLabel . ', aktif hingga ' . $user->expired_at->format('d M Y H:i') . '.');
     }
 
     /**
@@ -69,6 +94,7 @@ class UserController extends Controller
     {
         $user->update([
             'is_subscribed' => false,
+            'expired_at' => null,
         ]);
 
         return redirect()

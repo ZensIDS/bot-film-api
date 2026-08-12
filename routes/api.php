@@ -66,6 +66,29 @@ Route::get('/movies', function () {
     return response()->json($movies);
 });
 
+// Detail film untuk halaman /movie/{id} (gantikan demoMovies statis di movie-detail.blade.php)
+Route::get('/movies/{movie}', function (\App\Models\Movie $movie) {
+    if (!$movie->is_active) {
+        return response()->json(['message' => 'Film tidak ditemukan'], 404);
+    }
+
+    $movie->loadCount('episodes');
+
+    return response()->json([
+        'id' => $movie->id,
+        'title' => $movie->title,
+        'slug' => $movie->slug,
+        'genre' => $movie->genre,
+        'cover' => $movie->cover_url,
+        'type' => $movie->type,
+        'synopsis' => $movie->description,
+        'episodes' => $movie->type === 'series' ? $movie->episodes_count : 1,
+        'episode_list' => $movie->type === 'series'
+            ? $movie->episodes()->orderBy('episode_number')->get(['id', 'episode_number', 'title'])
+            : [],
+    ]);
+});
+
 // Request judul film baru (hanya untuk user yang berlangganan aktif)
 Route::middleware('telegram.auth')->post('/movie-requests', [MovieRequestController::class, 'store']);
 

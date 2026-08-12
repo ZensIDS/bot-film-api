@@ -142,6 +142,12 @@
                 <h2 class="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">Sinopsis</h2>
                 <p id="movie-synopsis" class="text-sm text-[var(--text)] leading-relaxed"></p>
             </div>
+
+            <!-- Daftar Episode (khusus film bertipe series) -->
+            <div id="episode-list-wrapper" class="hidden mt-6">
+                <h2 class="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-2">Daftar Episode</h2>
+                <div id="episode-list" class="space-y-2"></div>
+            </div>
         </div>
     </div>
 
@@ -158,14 +164,8 @@
     const tgUser = tg.initDataUnsafe?.user;
     let isSubscribed = false;
 
-    // TODO (Hari 8-9): ganti data statis ini dengan hasil fetch ke GET /api/movies/{id}
-    // Data harus sama dengan katalog di /app agar id-nya konsisten.
-    const demoMovies = [
-        { id: 1, title: "Cinta di Ujung Senja", episodes: 16, genre: "Romansa", cover: "https://picsum.photos/seed/drama1/300/400", synopsis: "Setelah bertahun-tahun berpisah karena kesalahpahaman keluarga, Alya dan Raka dipertemukan kembali di sebuah kota kecil tepi pantai. Di antara senja yang sama, mereka harus memilih antara melanjutkan hidup masing-masing atau memberi cinta lama kesempatan kedua." },
-        { id: 2, title: "Rahasia Kota Lama", episodes: 20, genre: "Misteri", cover: "https://picsum.photos/seed/drama2/300/400", synopsis: "Seorang jurnalis muda kembali ke kota kelahirannya untuk menyelidiki kematian misterius kakeknya. Setiap petunjuk yang ia temukan justru membongkar rahasia kelam yang selama ini disembunyikan seluruh kota." },
-        { id: 3, title: "Pewaris Takhta", episodes: 24, genre: "Drama Kerajaan", cover: "https://picsum.photos/seed/drama3/300/400", synopsis: "Perebutan takhta antar saudara memaksa Putri Wulan menempuh jalan yang tak pernah ia bayangkan: menyamar sebagai rakyat biasa untuk mengungkap konspirasi di dalam istananya sendiri." },
-        { id: 4, title: "Jalan Pulang", episodes: 12, genre: "Keluarga", cover: "https://picsum.photos/seed/drama4/300/400", synopsis: "Setelah 15 tahun merantau, Dimas pulang ke desanya membawa satu rahasia besar. Kisah hangat tentang keluarga, pengampunan, dan arti sesungguhnya dari kata 'rumah'." }
-    ];
+    // Data diambil dari GET /api/movies/{id} — sudah sinkron dengan katalog di /app.
+    let currentMovie = null;
 
     function showState(id){
         ['loading-state', 'not-found-state', 'outside-tg', 'movie-content'].forEach(s => {
@@ -175,12 +175,39 @@
     }
 
     function renderMovie(movie){
-        document.getElementById('movie-cover').src = movie.cover;
+        document.getElementById('movie-cover').src = movie.cover || 'https://placehold.co/300x400?text=No+Cover';
         document.getElementById('movie-cover').alt = `Poster ${movie.title}`;
-        document.getElementById('movie-genre').textContent = movie.genre;
+        document.getElementById('movie-genre').textContent = movie.genre || 'Drama';
         document.getElementById('movie-title').textContent = movie.title;
-        document.getElementById('movie-episodes').textContent = `${movie.episodes} Episode`;
-        document.getElementById('movie-synopsis').textContent = movie.synopsis;
+        document.getElementById('movie-episodes').textContent = movie.type === 'series'
+            ? `${movie.episodes} Episode`
+            : 'Single / Film Penuh';
+        document.getElementById('movie-synopsis').textContent = movie.synopsis || 'Belum ada sinopsis untuk film ini.';
+
+        renderEpisodeList(movie);
+    }
+
+    function renderEpisodeList(movie){
+        const wrapper = document.getElementById('episode-list-wrapper');
+        const list = document.getElementById('episode-list');
+
+        if (movie.type !== 'series' || !movie.episode_list || movie.episode_list.length === 0) {
+            wrapper.classList.add('hidden');
+            list.innerHTML = '';
+            return;
+        }
+
+        list.innerHTML = movie.episode_list.map(ep => `
+            <div class="flex items-center justify-between bg-[var(--surface)] border border-[var(--hairline)] rounded-xl px-4 py-3">
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-white">Episode ${ep.episode_number}</p>
+                    ${ep.title ? `<p class="text-[11px] text-[var(--text-muted)] truncate">${ep.title}</p>` : ''}
+                </div>
+                <span class="text-[10px] text-[var(--text-muted)]">▶</span>
+            </div>
+        `).join('');
+
+        wrapper.classList.remove('hidden');
     }
 
     function applySubscriptionState(){
@@ -238,13 +265,19 @@
             return;
         }
 
-        const movie = demoMovies.find(m => m.id === movieId);
-        if (!movie) {
+        try {
+            const res = await fetch(`/api/movies/${movieId}`);
+            if (!res.ok) {
+                showState('not-found-state');
+                return;
+            }
+            currentMovie = await res.json();
+        } catch (err) {
             showState('not-found-state');
             return;
         }
 
-        renderMovie(movie);
+        renderMovie(currentMovie);
 
         try {
             const res = await fetch(`/api/user/status`, {

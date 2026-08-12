@@ -50,6 +50,9 @@
             <a href="{{ route('admin.movies.index') }}" class="sidebar-link {{ request()->routeIs('admin.movies.*') ? 'active' : '' }}">
                 <span>🎬</span> Manajemen Film
             </a>
+            <a href="{{ route('admin.packages.index') }}" class="sidebar-link {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}">
+                <span>💎</span> Paket & Harga
+            </a>
             <a href="{{ route('admin.users.index') }}" class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                 <span>👤</span> User & Langganan
             </a>
