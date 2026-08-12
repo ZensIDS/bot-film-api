@@ -36,3 +36,23 @@ Route::get('/movie/{id}', function ($id) {
 Route::get('/request-film', function () {
     return view('request-film');
 });
+
+// ==============================
+// Admin Panel
+// ==============================
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Guest-only (belum login)
+    Route::middleware('guest:admin')->group(function () {
+        Route::get('/login', [\App\Http\Controllers\Admin\AuthController::class, 'showLogin'])->name('login');
+        Route::post('/login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->name('login.submit');
+    });
+
+    // Butuh login sebagai admin
+    Route::middleware('auth:admin')->group(function () {
+        Route::post('/logout', [\App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('logout');
+
+        Route::get('/', function () {
+            return view('admin.dashboard');
+        })->name('dashboard');
+    });
+});

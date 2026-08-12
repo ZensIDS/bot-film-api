@@ -14,8 +14,17 @@ class Authenticate extends Middleware
      */
     protected function redirectTo($request)
     {
-        if (! $request->expectsJson()) {
-            return route('login');
+        if ($request->expectsJson()) {
+            return null;
         }
+
+        // Halaman TWA (customer) tidak pakai login form, jadi hanya area /admin
+        // yang diarahkan ke halaman login. Selain itu, biarkan null (tidak redirect)
+        // supaya tidak error karena route('login') belum tentu ada di app ini.
+        if ($request->is('admin') || $request->is('admin/*')) {
+            return route('admin.login');
+        }
+
+        return null;
     }
 }
