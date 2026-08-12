@@ -52,8 +52,6 @@
 
 ### **Hari 8–9: Keamanan `initData` Telegram & Integrasi TWA Blade**
 
-### **Hari 8–9: Keamanan `initData` Telegram & Integrasi TWA Blade**
-
 - [x] **Validasi Keamanan Hash `initData`**:
     - [x] Buat Middleware Laravel (`VerifyTelegramInitData`) untuk memverifikasi HMAC-SHA256 signature dari `Telegram.WebApp.initData` (dikirim via header `X-Telegram-Init-Data`).
     - [x] Ekstrak data user Telegram (`id`, `first_name`, `username`) dari `initData` terverifikasi untuk auto-register/update user (`firstOrCreate`), diakses controller lewat `$request->attributes`.

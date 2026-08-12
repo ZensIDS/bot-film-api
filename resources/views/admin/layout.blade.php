@@ -47,7 +47,7 @@
             <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <span>🏠</span> Dashboard
             </a>
-            <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.movies.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.movies.index') }}" class="sidebar-link {{ request()->routeIs('admin.movies.*') ? 'active' : '' }}">
                 <span>🎬</span> Manajemen Film
             </a>
             <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">

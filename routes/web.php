@@ -54,5 +54,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', function () {
             return view('admin.dashboard');
         })->name('dashboard');
+
+        // Manajemen Film & Episode
+        Route::resource('movies', \App\Http\Controllers\Admin\MovieController::class);
+        Route::post('movies/{movie}/episodes', [\App\Http\Controllers\Admin\MovieController::class, 'storeEpisode'])->name('movies.episodes.store');
+        Route::put('movies/{movie}/episodes/{episode}', [\App\Http\Controllers\Admin\MovieController::class, 'updateEpisode'])->name('movies.episodes.update');
+        Route::delete('movies/{movie}/episodes/{episode}', [\App\Http\Controllers\Admin\MovieController::class, 'destroyEpisode'])->name('movies.episodes.destroy');
     });
 });
