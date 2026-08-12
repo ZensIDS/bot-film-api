@@ -250,7 +250,9 @@
         `;
 
         try {
-            const res = await fetch(`/api/movie-requests?telegram_id=${tgUser.id}`);
+            const res = await fetch(`/api/movie-requests`, {
+                headers: { 'X-Telegram-Init-Data': tg.initData }
+            });
             const result = await res.json();
 
             if (!res.ok) {
@@ -282,9 +284,12 @@
         try {
             const res = await fetch('/api/movie-requests', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Telegram-Init-Data': tg.initData
+                },
                 body: JSON.stringify({
-                    telegram_id: String(tgUser?.id),
                     movie_title: movieTitle,
                     source: movieSource,
                 })

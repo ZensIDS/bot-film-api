@@ -26,7 +26,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/telegram/webhook', [TelegramController::class, 'handleWebhook']);
 
 // API Integrated Midtrans (dipanggil dari halaman /checkout di dalam TWA)
-Route::post('/payment/create', [PaymentController::class, 'createTransaction']);
+Route::middleware('telegram.auth')->post('/payment/create', [PaymentController::class, 'createTransaction']);
 Route::post('/payment/callback', [PaymentController::class, 'handleCallback']);
 
 // Daftar paket untuk ditampilkan di TWA (tab Paket & halaman checkout)
@@ -44,20 +44,14 @@ Route::get('/packages/{package}', function (Package $package) {
 });
 
 // Request judul film baru (hanya untuk user yang berlangganan aktif)
-Route::post('/movie-requests', [MovieRequestController::class, 'store']);
+Route::middleware('telegram.auth')->post('/movie-requests', [MovieRequestController::class, 'store']);
 
 // Riwayat request film milik user
-Route::get('/movie-requests', [MovieRequestController::class, 'index']);
+Route::middleware('telegram.auth')->get('/movie-requests', [MovieRequestController::class, 'index']);
 
 // Integration TWA
-Route::get('/user/status', function (Request $request) {
-    $telegramId = $request->query('telegram_id');
-
-    if (!$telegramId) {
-        return response()->json(['is_subscribed' => false, 'message' => 'Telegram ID required'], 400);
-    }
-
-    $user = User::where('telegram_id', $telegramId)->first();
+Route::middleware('telegram.auth')->get('/user/status', function (Request $request) {
+    $user = $request->attributes->get('verified_telegram_user');
 
     $isSubscribed = $user && $user->is_subscribed && $user->expired_at && $user->expired_at->isFuture();
 

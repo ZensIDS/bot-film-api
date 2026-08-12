@@ -247,7 +247,9 @@
         renderMovie(movie);
 
         try {
-            const res = await fetch(`/api/user/status?telegram_id=${tgUser.id}`);
+            const res = await fetch(`/api/user/status`, {
+                headers: { 'X-Telegram-Init-Data': tg.initData }
+            });
             const result = await res.json();
             isSubscribed = !!result.is_subscribed;
         } catch (err) {

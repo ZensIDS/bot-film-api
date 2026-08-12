@@ -15,22 +15,17 @@ class MovieRequestController extends Controller
      */
     public function store(Request $request)
     {
-        // Telegram WebApp mengirim `id` sebagai number (bukan string), jadi validasi
-        // tidak boleh strict 'string' saja atau akan selalu gagal dengan pesan
-        // "The telegram id must be a string". Terima string maupun angka lalu
-        // di-cast ke string saat query.
         $validated = $request->validate([
-            'telegram_id' => 'required',
             'movie_title' => 'required|string|max:255',
             'source' => 'required|string|max:100',
         ]);
 
-        $telegramId = (string) $validated['telegram_id'];
-
-        $user = User::where('telegram_id', $telegramId)->first();
+        // Route ini pakai middleware telegram.auth, jadi user sudah terverifikasi
+        // lewat initData Telegram (bukan telegram_id mentah dari body request).
+        $user = $request->attributes->get('verified_telegram_user');
 
         if (!$user) {
-            return response()->json(['message' => 'User tidak ditemukan.'], 404);
+            return response()->json(['message' => 'Verifikasi Telegram gagal.'], 401);
         }
 
         $isSubscribed = $user->is_subscribed && $user->expired_at && $user->expired_at->isFuture();
@@ -59,13 +54,7 @@ class MovieRequestController extends Controller
      */
     public function index(Request $request)
     {
-        $validated = $request->validate([
-            'telegram_id' => 'required',
-        ]);
-
-        $telegramId = (string) $validated['telegram_id'];
-
-        $user = User::where('telegram_id', $telegramId)->first();
+        $user = $request->attributes->get('verified_telegram_user');
 
         if (!$user) {
             return response()->json(['data' => []]);

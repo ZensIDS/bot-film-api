@@ -30,11 +30,19 @@ class PaymentController extends Controller
     public function createTransaction(Request $request)
     {
         $request->validate([
-            'telegram_id' => 'required',
             'package_id' => 'required|exists:packages,id',
         ]);
 
-        $user = User::where('telegram_id', (string)$request->telegram_id)->firstOrFail();
+        // Prioritaskan user yang sudah diverifikasi lewat middleware VerifyTelegramInitData
+        // (route ini pakai middleware telegram.auth), fallback ke telegram_id mentah hanya
+        // untuk kompatibilitas kalau suatu saat dipanggil tanpa middleware tsb.
+        $user = $request->attributes->get('verified_telegram_user');
+
+        if (!$user) {
+            $request->validate(['telegram_id' => 'required']);
+            $user = User::where('telegram_id', (string) $request->telegram_id)->firstOrFail();
+        }
+
         $package = Package::where('is_active', true)->findOrFail($request->package_id);
 
         $orderId = 'INV-' . strtoupper(Str::random(6)) . '-' . time();

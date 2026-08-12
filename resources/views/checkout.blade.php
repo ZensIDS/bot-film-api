@@ -174,9 +174,12 @@
         try {
             const response = await fetch('/api/payment/create', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Telegram-Init-Data': tg.initData
+                },
                 body: JSON.stringify({
-                    telegram_id: tgUser.id,
                     package_id: currentPackage.id
                 })
             });

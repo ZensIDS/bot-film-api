@@ -493,7 +493,9 @@
         document.getElementById('profile-id').textContent = `ID: ${tgUser.id}`;
 
         try {
-            const response = await fetch(`/api/user/status?telegram_id=${tgUser.id}`);
+            const response = await fetch(`/api/user/status`, {
+                headers: { 'X-Telegram-Init-Data': tg.initData }
+            });
             if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
 
             const result = await response.json();
