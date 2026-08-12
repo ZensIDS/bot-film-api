@@ -57,6 +57,14 @@ class TelegramController extends Controller
                 $username = $message['from']['username'] ?? null;
                 $firstName = $message['from']['first_name'] ?? 'User';
 
+                // Khusus admin: kalau kirim video (atau file video sebagai document) ke bot,
+                // langsung balas telegram_file_id-nya. Dipakai untuk isi form Manajemen Film
+                // di Admin Panel tanpa perlu ambil file_id manual lewat Telegram API.
+                if ($this->isWhitelistedAdmin($chatId) && (isset($message['video']) || $this->isVideoDocument($message))) {
+                    $this->handleAdminVideoUpload($chatId, $message);
+                    return response()->json(['status' => 'success'], 200);
+                }
+
                 // Simpan / Update User ke Database MySQL
                 $user = User::firstOrCreate(
                     ['telegram_id' => $chatId],
@@ -168,6 +176,56 @@ class TelegramController extends Controller
         ];
 
         $this->sendMessageWithKeyboard($chatId, $text, $keyboard);
+    }
+
+    /**
+     * Cek apakah chat_id ini terdaftar sebagai admin (whitelist via TELEGRAM_ADMIN_IDS di .env,
+     * dipisah koma, contoh: TELEGRAM_ADMIN_IDS=111111111,222222222).
+     * Wajib pakai whitelist supaya sembarang user tidak bisa "membajak" fitur ambil file_id ini.
+     */
+    private function isWhitelistedAdmin($chatId): bool
+    {
+        $adminIds = array_filter(array_map('trim', explode(',', (string) env('TELEGRAM_ADMIN_IDS', ''))));
+
+        return in_array((string) $chatId, $adminIds, true);
+    }
+
+    /**
+     * Beberapa client Telegram (terutama Desktop) mengirim video sebagai 'document'
+     * kalau dikirim lewat opsi "Send as File". Deteksi itu lewat mime_type.
+     */
+    private function isVideoDocument(array $message): bool
+    {
+        return isset($message['document']['mime_type'])
+            && str_starts_with($message['document']['mime_type'], 'video/');
+    }
+
+    /**
+     * Balas ke admin dengan telegram_file_id dari video yang baru dikirim,
+     * siap di-copy ke form Manajemen Film di Admin Panel.
+     */
+    private function handleAdminVideoUpload($chatId, array $message)
+    {
+        $video = $message['video'] ?? $message['document'] ?? null;
+
+        if (!$video || !isset($video['file_id'])) {
+            $this->sendMessage($chatId, "⚠️ Gagal membaca file video. Coba kirim ulang.");
+            return;
+        }
+
+        $fileId = $video['file_id'];
+        $fileName = $video['file_name'] ?? null;
+        $durationText = isset($video['duration']) ? gmdate('H:i:s', $video['duration']) : '-';
+        $sizeText = isset($video['file_size']) ? number_format($video['file_size'] / 1048576, 1) . ' MB' : '-';
+
+        $text = "🎬 *Video Diterima!*\n\n"
+            . ($fileName ? "Nama File: `{$fileName}`\n" : "")
+            . "Durasi: {$durationText}\n"
+            . "Ukuran: {$sizeText}\n\n"
+            . "Telegram File ID:\n`{$fileId}`\n\n"
+            . "Salin ID di atas, lalu tempel ke form film/episode di Admin Panel.";
+
+        $this->sendMessage($chatId, $text);
     }
 
     private function sendMessage($chatId, $text)
