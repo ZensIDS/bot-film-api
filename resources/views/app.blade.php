@@ -439,8 +439,8 @@
             return;
         }
 
-        list.innerHTML = packages.map((pkg, index) => {
-            const isFeatured = index === packages.length - 1 && packages.length > 1; // tandai paket termahal sebagai "Paling Laris"
+        list.innerHTML = packages.map((pkg) => {
+            const isFeatured = !!pkg.is_most_popular; // ditentukan dari jumlah transaksi SUCCESS terbanyak di backend
             const priceFormatted = `Rp ${Number(pkg.price).toLocaleString('id-ID')}`;
 
             return `

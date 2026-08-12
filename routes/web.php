@@ -66,6 +66,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('packages', [\App\Http\Controllers\Admin\PackageController::class, 'store'])->name('packages.store');
         Route::put('packages/{package}', [\App\Http\Controllers\Admin\PackageController::class, 'update'])->name('packages.update');
         Route::post('packages/{package}/toggle-active', [\App\Http\Controllers\Admin\PackageController::class, 'toggleActive'])->name('packages.toggle-active');
+        Route::post('packages/{package}/mark-featured', [\App\Http\Controllers\Admin\PackageController::class, 'markFeatured'])->name('packages.mark-featured');
+        Route::post('packages/{package}/unmark-featured', [\App\Http\Controllers\Admin\PackageController::class, 'unmarkFeatured'])->name('packages.unmark-featured');
         Route::delete('packages/{package}', [\App\Http\Controllers\Admin\PackageController::class, 'destroy'])->name('packages.destroy');
 
         // Manajemen User & Langganan
@@ -76,5 +78,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Riwayat Transaksi
         Route::get('transactions', [\App\Http\Controllers\Admin\TransactionController::class, 'index'])->name('transactions.index');
         Route::post('transactions/withdraw', [\App\Http\Controllers\Admin\TransactionController::class, 'withdraw'])->name('transactions.withdraw');
+
+        // Pengelolaan Request Film
+        Route::get('movie-requests', [\App\Http\Controllers\Admin\MovieRequestController::class, 'index'])->name('movie-requests.index');
+        Route::post('movie-requests/{movieRequest}/status', [\App\Http\Controllers\Admin\MovieRequestController::class, 'updateStatus'])->name('movie-requests.update-status');
     });
 });

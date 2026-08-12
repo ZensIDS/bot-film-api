@@ -117,6 +117,35 @@ class TelegramController extends Controller
                     $this->sendPackageList($chatId);
                 }
             }
+
+            // 3. Handling Channel Post (bot ditambahkan/jadi admin di sebuah channel privat)
+            // PENTING: update tipe ini TIDAK dikirim Telegram kalau webhook di-set dengan
+            // parameter allowed_updates yang tidak menyertakan "channel_post". Kalau setelah
+            // perbaikan ini bot masih belum membalas di channel, set ulang webhook-nya tanpa
+            // allowed_updates (biar semua tipe update dikirim) atau sertakan "channel_post"
+            // secara eksplisit di dalamnya.
+            elseif (isset($update['channel_post'])) {
+                $post = $update['channel_post'];
+                $chatId = $post['chat']['id'];
+                $chatTitle = $post['chat']['title'] ?? 'channel ini';
+                $text = $post['text'] ?? '';
+
+                // Sama seperti di chat pribadi: kalau admin kirim/post video ke channel privat,
+                // bot balas telegram_file_id-nya supaya bisa langsung dipakai di form Manajemen Film.
+                if ($this->isWhitelistedAdmin($chatId) && (isset($post['video']) || $this->isVideoDocument($post))) {
+                    $this->handleAdminVideoUpload($chatId, $post);
+                    return response()->json(['status' => 'success'], 200);
+                }
+
+                if (str_starts_with($text, '/start')) {
+                    $replyText = "🤖 *NiceDramaBot* berhasil terhubung ke *{$chatTitle}*.\n\n"
+                        . "Chat ID channel ini:\n`{$chatId}`\n\n"
+                        . "Kalau ingin bot bisa membaca video yang di-post di sini untuk diambil Telegram File ID-nya, "
+                        . "tambahkan Chat ID di atas ke daftar `TELEGRAM_ADMIN_IDS` pada file `.env` (pisahkan dengan koma jika lebih dari satu), lalu restart aplikasi.";
+
+                    $this->sendMessage($chatId, $replyText);
+                }
+            }
         } catch (\Exception $e) {
             Log::error('Telegram Controller Error: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
         }

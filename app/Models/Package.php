@@ -14,10 +14,12 @@ class Package extends Model
         'duration_days',
         'price',
         'is_active',
+        'is_featured',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
         'price' => 'decimal:2',
     ];
 

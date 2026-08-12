@@ -59,7 +59,7 @@
             <a href="{{ route('admin.transactions.index') }}" class="sidebar-link {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}">
                 <span>💳</span> Riwayat Transaksi
             </a>
-            <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.movie-requests.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.movie-requests.index') }}" class="sidebar-link {{ request()->routeIs('admin.movie-requests.*') ? 'active' : '' }}">
                 <span>📥</span> Request Film
             </a>
         </nav>

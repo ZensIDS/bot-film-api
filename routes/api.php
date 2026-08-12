@@ -31,9 +31,17 @@ Route::post('/payment/callback', [PaymentController::class, 'handleCallback']);
 
 // Daftar paket untuk ditampilkan di TWA (tab Paket & halaman checkout)
 Route::get('/packages', function () {
-    return response()->json(
-        Package::where('is_active', true)->orderBy('price')->get()
-    );
+    $packages = Package::where('is_active', true)
+        ->orderBy('price')
+        ->get()
+        ->map(function ($package) {
+            // Badge "Paling Laris" ditentukan manual oleh admin lewat Admin Panel
+            // (kolom is_featured), bukan dihitung otomatis dari jumlah transaksi.
+            $package->is_most_popular = $package->is_featured;
+            return $package;
+        });
+
+    return response()->json($packages);
 });
 
 Route::get('/packages/{package}', function (Package $package) {

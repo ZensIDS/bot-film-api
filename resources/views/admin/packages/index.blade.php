@@ -31,6 +31,9 @@
                 <tr class="border-b border-[var(--hairline)] last:border-0 hover:bg-[var(--surface-2)]/40">
                     <td class="px-5 py-3">
                         <p class="font-semibold text-white">{{ $package->name }}</p>
+                        @if ($package->is_featured)
+                            <span class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--gold)] text-black uppercase tracking-wide">🔥 Paling Laris</span>
+                        @endif
                     </td>
                     <td class="px-5 py-3 text-[var(--text-muted)]">{{ $package->duration_days }} Hari</td>
                     <td class="px-5 py-3 text-[var(--text)] font-semibold">Rp {{ number_format($package->price, 0, ',', '.') }}</td>
@@ -51,6 +54,7 @@
                                     'duration_days' => $package->duration_days,
                                     'price' => (float) $package->price,
                                     'is_active' => $package->is_active,
+                                    'is_featured' => $package->is_featured,
                                     'action' => route('admin.packages.update', $package),
                                 ]) }})"
                                 class="text-xs font-semibold text-[var(--gold-soft)] hover:text-[var(--gold)] whitespace-nowrap">
@@ -63,6 +67,22 @@
                                     {{ $package->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                 </button>
                             </form>
+
+                            @if ($package->is_featured)
+                                <form action="{{ route('admin.packages.unmark-featured', $package) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="text-xs font-semibold text-[var(--gold)] hover:text-[var(--gold-soft)] whitespace-nowrap">
+                                        Lepas Laris
+                                    </button>
+                                </form>
+                            @else
+                                <form action="{{ route('admin.packages.mark-featured', $package) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--gold-soft)] whitespace-nowrap">
+                                        Jadikan Laris
+                                    </button>
+                                </form>
+                            @endif
 
                             <button type="button"
                                 onclick="openDeletePackageModal('{{ route('admin.packages.destroy', $package) }}', {{ Illuminate\Support\Js::from($package->name) }})"
@@ -110,10 +130,16 @@
                 </div>
             </div>
 
-            <label class="flex items-center gap-2 mb-6 cursor-pointer select-none">
+            <label class="flex items-center gap-2 mb-3 cursor-pointer select-none">
                 <input type="checkbox" name="is_active" id="packageIsActive" value="1" checked
                     class="w-4 h-4 rounded accent-[var(--gold)]">
                 <span class="text-xs text-[var(--text)]">Aktifkan paket ini (tampil di Mini App)</span>
+            </label>
+
+            <label class="flex items-center gap-2 mb-6 cursor-pointer select-none">
+                <input type="checkbox" name="is_featured" id="packageIsFeatured" value="1"
+                    class="w-4 h-4 rounded accent-[var(--gold)]">
+                <span class="text-xs text-[var(--text)]">Tandai sebagai "Paling Laris" (menggantikan paket lain yang sebelumnya ditandai)</span>
             </label>
 
             <div class="flex items-center justify-end gap-3">
@@ -174,6 +200,7 @@
             document.getElementById('packageDuration').value = pkg.duration_days;
             document.getElementById('packagePrice').value = pkg.price;
             document.getElementById('packageIsActive').checked = !!pkg.is_active;
+            document.getElementById('packageIsFeatured').checked = !!pkg.is_featured;
         } else {
             document.getElementById('packageModalTitle').textContent = 'Tambah Paket';
             form.action = "{{ route('admin.packages.store') }}";
@@ -182,6 +209,7 @@
             document.getElementById('packageDuration').value = 30;
             document.getElementById('packagePrice').value = 10000;
             document.getElementById('packageIsActive').checked = true;
+            document.getElementById('packageIsFeatured').checked = false;
         }
 
         const backdrop = document.getElementById('packageModalBackdrop');
