@@ -58,12 +58,12 @@
     - [x] Terapkan middleware ke endpoint sensitif: `/payment/create`, `/movie-requests` (POST & GET), `/user/status`.
 - [ ] **Integrasi UI Blade TWA dengan API Backend**:
     - [x] Tab Paket & halaman `/checkout` sudah terhubung ke `GET /api/packages` & `GET /api/packages/{id}`.
-    - [ ] Halaman Beranda/Katalog Blade masih pakai data dummy (`demoDramas`) — belum terhubung ke tabel `movies` di DB. **Perlu dibuat**: model `Movie`, migration, `GET /api/movies`, lalu update `renderDramaList()` di `app.blade.php`.
-    - [x] Tombol Checkout terhubung ke `POST /api/payment/create` → mengembalikan `snap_token`, dirender langsung di halaman `/checkout` via `window.snap.pay()` (satu alur di dalam TWA, tanpa redirect keluar app/browser).
+    - [ ] Halaman Beranda/Katalog Blade masih pakai data dummy (`demoDramas`) — belum terhubung ke tabel `movies` di DB. **Perlu dibuat**: model `Movie` ✅ (sudah ada), migration ✅, `GET /api/movies` ❌, lalu update `renderDramaList()` di `app.blade.php` ❌.
+    - [x] Tombol Checkout terhubung ke `POST /api/payment/create` → mengembalikan `snap_token`, dirender langsung di halaman `/checkout` via `window.snap.pay()`.
 - [ ] **Logika Akses Konten di TWA**:
-    - [x] Status user (Aktif/Belum VIP) sudah dicek di `app.blade.php`, `movie-detail.blade.php`, `request-film.blade.php` via `/api/user/status` (sekarang lebih aman karena pakai initData terverifikasi).
-    - [ ] Endpoint `/api/movies/{id}/watch` (tombol "Tonton via Bot" / kirim video ke chat) **masih dipanggil dari frontend tapi belum ada route & controller-nya** — nyambung ke poin katalog film di atas.
-    - [x] Kalau belum VIP → tombol "Beli Paket VIP" sudah terpasang di beberapa halaman (`request-film.blade.php`, dan alur checkout umum).
+    - [x] Status user (Aktif/Belum VIP) sudah dicek di `app.blade.php`, `movie-detail.blade.php`, `request-film.blade.php` via `/api/user/status`.
+    - [ ] Endpoint `/api/movies/{id}/watch` (tombol "Tonton via Bot" / kirim video ke chat) **masih dipanggil dari frontend tapi belum ada route & controller-nya**.
+    - [x] Kalau belum VIP → tombol "Beli Paket VIP" sudah terpasang di beberapa halaman.
 
 ---
 
@@ -84,20 +84,20 @@
 ### **Hari 12–13: Admin Panel (Manajemen User & Film) + End-to-End Testing**
 
 - [ ] **Pengembangan Dashboard Admin**:
-    - [ ] Buat fitur **Manajemen Film**: CRUD data film (Judul, Genre, Deskripsi, Poster, `telegram_file_id`).
-    - [ ] Buat fitur **Manajemen User & Langganan**: Melihat daftar user Telegram, status VIP, tanggal kadaluarsa, serta tombol _Manual Extend VIP_.
-    - [ ] Buat fitur **Riwayat Transaksi**: Monitor transaksi Midtrans (`invoice_code`, nominal, status `SUCCESS`/`PENDING`/`FAILED`).
+    - [x] **Manajemen Film**: CRUD data film (Judul, Genre, Deskripsi, Poster upload, `telegram_file_id`) — ✅ **baru selesai**, termasuk manajemen Episode untuk tipe series.
+    - [ ] **Manajemen User & Langganan**: Melihat daftar user Telegram, status VIP, tanggal kadaluarsa, serta tombol _Manual Extend VIP_.
+    - [ ] **Riwayat Transaksi**: Monitor transaksi Midtrans (`invoice_code`, nominal, status `SUCCESS`/`PENDING`/`FAILED`).
 - [ ] **Pengujian Ketat (End-to-End Testing)**:
     - [ ] Uji alur pembukaan TWA dari Telegram Android, iOS, dan Desktop.
-    - [ ] Uji alur transaksi nyata di Midtrans Sandbox: Pilih Paket ──► Snap Popup ──► Bayar via QRIS/VA ──► Callback Webhook ──► Status VIP User Aktif otomatis + Pesan Notifikasi Telegram terkirim.
-    - [ ] Uji tombol "Tonton Sekarang": Dipastikan bot langsung membalas chat privat user dengan video film yang terproteksi.
+    - [ ] Uji alur transaksi nyata di Midtrans Sandbox.
+    - [ ] Uji tombol "Tonton Sekarang".
     - [ ] Uji input request film di TWA oleh user dan pastikan tersimpan di DB Admin.
 
 ---
 
 ### **Hari 14: Final Setup & GO LIVE! 🚀**
 
-- [ ] Mendaftarkan URL Domain Hosting (`https://nice.decaasoftwares.com`) sebagai **Menu Button TWA** di `@BotFather` (perintah `/setmenubutton`).
-- [ ] Konfigurasi Webhook Telegram Production dan Callback Midtrans Production/Sandbox di domain hosting.
-- [ ] Lakukan _final sanity check_ seluruh alur (TWA, Midtrans Snap, Webhook, Bot Auto-reply, dan Content Protection).
+- [ ] Mendaftarkan URL Domain Hosting sebagai **Menu Button TWA** di `@BotFather`.
+- [ ] Konfigurasi Webhook Telegram Production dan Callback Midtrans Production/Sandbox.
+- [ ] Lakukan _final sanity check_ seluruh alur.
 - [ ] **BOT FILM TWA RESMI LAUNCHING & SIAP DIPROMOSIKAN!**

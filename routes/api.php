@@ -43,6 +43,29 @@ Route::get('/packages/{package}', function (Package $package) {
     return response()->json($package);
 });
 
+// Katalog film untuk Beranda TWA (gantikan demoDramas di app.blade.php)
+Route::get('/movies', function () {
+    $movies = \App\Models\Movie::active()
+        ->withCount('episodes')
+        ->latest()
+        ->get()
+        ->map(function ($movie) {
+            return [
+                'id' => $movie->id,
+                'title' => $movie->title,
+                'slug' => $movie->slug,
+                'genre' => $movie->genre,
+                'cover' => $movie->cover_url,
+                'type' => $movie->type,
+                // untuk series: jumlah episode yang sudah diinput admin.
+                // untuk single: dianggap 1 "episode" (file tunggal).
+                'episodes' => $movie->type === 'series' ? $movie->episodes_count : 1,
+            ];
+        });
+
+    return response()->json($movies);
+});
+
 // Request judul film baru (hanya untuk user yang berlangganan aktif)
 Route::middleware('telegram.auth')->post('/movie-requests', [MovieRequestController::class, 'store']);
 

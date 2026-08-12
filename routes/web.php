@@ -60,5 +60,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('movies/{movie}/episodes', [\App\Http\Controllers\Admin\MovieController::class, 'storeEpisode'])->name('movies.episodes.store');
         Route::put('movies/{movie}/episodes/{episode}', [\App\Http\Controllers\Admin\MovieController::class, 'updateEpisode'])->name('movies.episodes.update');
         Route::delete('movies/{movie}/episodes/{episode}', [\App\Http\Controllers\Admin\MovieController::class, 'destroyEpisode'])->name('movies.episodes.destroy');
+
+        // Manajemen User & Langganan
+        Route::get('users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+        Route::post('users/{user}/extend-vip', [\App\Http\Controllers\Admin\UserController::class, 'extendVip'])->name('users.extend-vip');
+        Route::post('users/{user}/revoke-vip', [\App\Http\Controllers\Admin\UserController::class, 'revokeVip'])->name('users.revoke-vip');
+
+        // Riwayat Transaksi
+        Route::get('transactions', [\App\Http\Controllers\Admin\TransactionController::class, 'index'])->name('transactions.index');
     });
 });

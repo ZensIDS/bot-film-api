@@ -358,13 +358,7 @@
     tg.ready();
     tg.expand();
 
-    // TODO (Hari 8-9): ganti data statis ini dengan hasil fetch ke GET /api/movies
-    const demoDramas = [
-        { id: 1, title: "Cinta di Ujung Senja", episodes: 16, genre: "Romansa", cover: "https://picsum.photos/seed/drama1/300/400", synopsis: "Setelah bertahun-tahun berpisah karena kesalahpahaman keluarga, Alya dan Raka dipertemukan kembali di sebuah kota kecil tepi pantai. Di antara senja yang sama, mereka harus memilih antara melanjutkan hidup masing-masing atau memberi cinta lama kesempatan kedua." },
-        { id: 2, title: "Rahasia Kota Lama", episodes: 20, genre: "Misteri", cover: "https://picsum.photos/seed/drama2/300/400", synopsis: "Seorang jurnalis muda kembali ke kota kelahirannya untuk menyelidiki kematian misterius kakeknya. Setiap petunjuk yang ia temukan justru membongkar rahasia kelam yang selama ini disembunyikan seluruh kota." },
-        { id: 3, title: "Pewaris Takhta", episodes: 24, genre: "Drama Kerajaan", cover: "https://picsum.photos/seed/drama3/300/400", synopsis: "Perebutan takhta antar saudara memaksa Putri Wulan menempuh jalan yang tak pernah ia bayangkan: menyamar sebagai rakyat biasa untuk mengungkap konspirasi di dalam istananya sendiri." },
-        { id: 4, title: "Jalan Pulang", episodes: 12, genre: "Keluarga", cover: "https://picsum.photos/seed/drama4/300/400", synopsis: "Setelah 15 tahun merantau, Dimas pulang ke desanya membawa satu rahasia besar. Kisah hangat tentang keluarga, pengampunan, dan arti sesungguhnya dari kata 'rumah'." }
-    ];
+    let movies = [];
 
     let currentGenre = 'Semua';
 
@@ -381,11 +375,11 @@
         list.innerHTML = dramas.map(d => `
             <div class="poster" onclick="goToMovie(${d.id})" role="button" tabindex="0">
                 <div class="poster__frame">
-                    <img src="${d.cover}" alt="Poster ${d.title}" loading="lazy">
-                    <span class="poster__badge">${d.genre}</span>
+                    <img src="${d.cover || 'https://placehold.co/300x400/1E1930/9C93AF?text=No+Cover'}" alt="Poster ${d.title}" loading="lazy">
+                    <span class="poster__badge">${d.genre || 'Umum'}</span>
                     <div class="poster__meta">
                         <h3 class="font-display text-sm font-semibold leading-tight truncate">${d.title}</h3>
-                        <p class="text-[11px] text-[var(--text-muted)] mt-0.5">${d.episodes} Episode</p>
+                        <p class="text-[11px] text-[var(--text-muted)] mt-0.5">${d.type === 'series' ? d.episodes + ' Episode' : 'Film'}</p>
                     </div>
                 </div>
             </div>
@@ -394,7 +388,7 @@
 
     function handleSearchFilter(){
         const query = document.getElementById('search-input').value.toLowerCase();
-        const filtered = demoDramas.filter(d => {
+        const filtered = movies.filter(d => {
             const matchSearch = d.title.toLowerCase().includes(query);
             const matchGenre = currentGenre === 'Semua' || d.genre === currentGenre;
             return matchSearch && matchGenre;
@@ -409,6 +403,18 @@
         });
         btnElement.className = "genre-chip px-3.5 py-1.5 rounded-full bg-[var(--gold)] text-black font-semibold whitespace-nowrap transition";
         handleSearchFilter();
+    }
+
+    async function fetchMovies() {
+        try {
+            const res = await fetch('/api/movies');
+            movies = await res.json();
+            renderDramaList(movies);
+        } catch (err) {
+            console.error('Gagal memuat katalog film:', err);
+            document.getElementById('drama-list').innerHTML =
+                `<p class="col-span-2 text-center text-xs text-[var(--crimson)] py-8">Gagal memuat katalog. Coba lagi nanti.</p>`;
+        }
     }
 
     function switchTab(tabName) {
@@ -503,7 +509,7 @@
             mainAppEl.classList.remove('hidden');
             footerNavEl.classList.remove('hidden');
 
-            renderDramaList(demoDramas);
+            fetchMovies();
             fetchPackages();
 
             const requestedTab = new URLSearchParams(window.location.search).get('tab');
