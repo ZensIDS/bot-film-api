@@ -43,41 +43,63 @@
 - [x] Pasang SDK Telegram Web App `<script src="https://telegram.org/js/telegram-web-app.js"></script>` di `<head>`.
 - [x] Buat halaman/modal **Pilihan Paket Langganan & Payment InApp Midtrans**.
 - [x] Buat halaman **Katalog Film** (Grid poster film, search, & filter genre).
-- [ ] Buat **Halaman Detail Film** (Sinopsis & Tombol "Tonton Sekarang").
-- [ ] Buat halaman/form **Request Film Baru**.
+- [x] Buat **Halaman Detail Film** (Sinopsis & Tombol "Tonton Sekarang").
+- [x] Buat halaman/form **Request Film Baru**.
 
 ---
 
-## 🔵 MINGGU 2: Integrasi System, Proteksi Media, Testing, & Launching
+## 🔵 MINGGU 2: Integrasi System, Proteksi Media, Admin Panel, & Launching
 
-### **Hari 8–9: Integrasi TWA ⇄ API Laravel**
+### **Hari 8–9: Keamanan `initData` Telegram & Integrasi TWA Blade**
 
-- [ ] Hubungkan UI Vercel ke API Laravel menggunakan `fetch` / `axios`.
-- [ ] Implementasikan verifikasi hash `initData` Telegram di Middleware Laravel agar API aman dari luar.
-- [ ] Hubungkan komponen Katalog TWA dengan API GET `/api/movies`.
-- [ ] Hubungkan tombol Checkout di TWA dengan API POST `/api/transactions/create`.
-- [ ] Buat logika validasi di TWA:
-    - [ ] Jika status user **Aktif** ──► panggil API untuk memicu bot mengirimkan video film.
-    - [ ] Jika status user **Tidak Aktif** ──► munculkan modal pembayaran QRIS Webkus.
+### **Hari 8–9: Keamanan `initData` Telegram & Integrasi TWA Blade**
 
-### **Hari 10–11: Sistem Gudang Film (`file_id`) & Proteksi Media**
+- [x] **Validasi Keamanan Hash `initData`**:
+    - [x] Buat Middleware Laravel (`VerifyTelegramInitData`) untuk memverifikasi HMAC-SHA256 signature dari `Telegram.WebApp.initData` (dikirim via header `X-Telegram-Init-Data`).
+    - [x] Ekstrak data user Telegram (`id`, `first_name`, `username`) dari `initData` terverifikasi untuk auto-register/update user (`firstOrCreate`), diakses controller lewat `$request->attributes`.
+    - [x] Terapkan middleware ke endpoint sensitif: `/payment/create`, `/movie-requests` (POST & GET), `/user/status`.
+- [ ] **Integrasi UI Blade TWA dengan API Backend**:
+    - [x] Tab Paket & halaman `/checkout` sudah terhubung ke `GET /api/packages` & `GET /api/packages/{id}`.
+    - [ ] Halaman Beranda/Katalog Blade masih pakai data dummy (`demoDramas`) — belum terhubung ke tabel `movies` di DB. **Perlu dibuat**: model `Movie`, migration, `GET /api/movies`, lalu update `renderDramaList()` di `app.blade.php`.
+    - [x] Tombol Checkout terhubung ke `POST /api/payment/create` → mengembalikan `snap_token`, dirender langsung di halaman `/checkout` via `window.snap.pay()` (satu alur di dalam TWA, tanpa redirect keluar app/browser).
+- [ ] **Logika Akses Konten di TWA**:
+    - [x] Status user (Aktif/Belum VIP) sudah dicek di `app.blade.php`, `movie-detail.blade.php`, `request-film.blade.php` via `/api/user/status` (sekarang lebih aman karena pakai initData terverifikasi).
+    - [ ] Endpoint `/api/movies/{id}/watch` (tombol "Tonton via Bot" / kirim video ke chat) **masih dipanggil dari frontend tapi belum ada route & controller-nya** — nyambung ke poin katalog film di atas.
+    - [x] Kalau belum VIP → tombol "Beli Paket VIP" sudah terpasang di beberapa halaman (`request-film.blade.php`, dan alur checkout umum).
 
-- [ ] Admin mengunggah berkas film ke Channel Privat Telegram untuk mendapatkan `file_id`.
-- [ ] Input data film beserta `telegram_file_id` ke database MySQL.
-- [ ] Implementasikan API pengiriman video film via Telegram API `sendVideo` di Laravel.
-- [ ] **Proteksi Media**: Pastikan parameter `protect_content => true` aktif saat pengiriman video agar pengguna tidak dapat men-download, merekam layar, atau membagikan (_forward_) video.
+---
 
-### **Hari 12–13: Testing Ketat (End-to-End Test)**
+### **Hari 10–11: Gudang Film (`file_id`), Proteksi Media, & Bot Streamer**
 
-- [ ] Uji alur pembuka TWA dari dalam aplikasi Telegram versi Android & iOS.
-- [ ] Uji alur transaksi nyata: Klik Paket ──► Scan QRIS Webkus ──► Callback sukses ──► Status berubah otomatis.
-- [ ] Uji fitur tombol "Tonton Sekarang": Pastikan bot langsung mengirimkan video ke _chat privat_ user setelah diklik dari TWA.
-- [ ] Uji proteksi konten: Pastikan media video terikat aturan `protect_content`.
-- [ ] Uji alur input Request Film di TWA dan verifikasi data masuk ke database.
+- [ ] **Sistem Gudang Film (Private Channel)**:
+    - [ ] Buat Channel Telegram Privat khusus gudang film dan tambahkan Bot sebagai Admin.
+    - [ ] Admin mengunggah berkas video film ke Channel Privat untuk mendapatkan `telegram_file_id` (via log webhook bot atau command khusus admin).
+- [ ] **Integrasi Pengiriman Video via Telegram API**:
+    - [ ] Buat endpoint/command handler Laravel yang memanggil Telegram Bot API `sendVideo` / `copyMessage`.
+    - [ ] Masukkan `chat_id` user dan `telegram_file_id` film yang diminta.
+- [ ] **Implementasi Proteksi Media (Content Protection)**:
+    - [ ] Pastikan parameter `'protect_content' => true` aktif pada setiap request `sendVideo` / `sendDocument`.
+    - [ ] _Skenario Teruji:_ Mencegah pengguna mendownload, menyimpan ke galeri, merekam layar (_screen record_), atau meneruskan (_forward_) video ke chat lain.
+
+---
+
+### **Hari 12–13: Admin Panel (Manajemen User & Film) + End-to-End Testing**
+
+- [ ] **Pengembangan Dashboard Admin**:
+    - [ ] Buat fitur **Manajemen Film**: CRUD data film (Judul, Genre, Deskripsi, Poster, `telegram_file_id`).
+    - [ ] Buat fitur **Manajemen User & Langganan**: Melihat daftar user Telegram, status VIP, tanggal kadaluarsa, serta tombol _Manual Extend VIP_.
+    - [ ] Buat fitur **Riwayat Transaksi**: Monitor transaksi Midtrans (`invoice_code`, nominal, status `SUCCESS`/`PENDING`/`FAILED`).
+- [ ] **Pengujian Ketat (End-to-End Testing)**:
+    - [ ] Uji alur pembukaan TWA dari Telegram Android, iOS, dan Desktop.
+    - [ ] Uji alur transaksi nyata di Midtrans Sandbox: Pilih Paket ──► Snap Popup ──► Bayar via QRIS/VA ──► Callback Webhook ──► Status VIP User Aktif otomatis + Pesan Notifikasi Telegram terkirim.
+    - [ ] Uji tombol "Tonton Sekarang": Dipastikan bot langsung membalas chat privat user dengan video film yang terproteksi.
+    - [ ] Uji input request film di TWA oleh user dan pastikan tersimpan di DB Admin.
+
+---
 
 ### **Hari 14: Final Setup & GO LIVE! 🚀**
 
-- [ ] Mendaftarkan URL Vercel sebagai **Menu Button TWA** di `@BotFather` (perintah `/setmenubutton`).
-- [ ] Pastikan server Laravel, SSL/HTTPS, database MySQL, dan Webhook Webkus berjalan stabil.
-- [ ] Lakukan _final sanity check_ seluruh fitur.
+- [ ] Mendaftarkan URL Domain Hosting (`https://nice.decaasoftwares.com`) sebagai **Menu Button TWA** di `@BotFather` (perintah `/setmenubutton`).
+- [ ] Konfigurasi Webhook Telegram Production dan Callback Midtrans Production/Sandbox di domain hosting.
+- [ ] Lakukan _final sanity check_ seluruh alur (TWA, Midtrans Snap, Webhook, Bot Auto-reply, dan Content Protection).
 - [ ] **BOT FILM TWA RESMI LAUNCHING & SIAP DIPROMOSIKAN!**

@@ -324,7 +324,9 @@
         }
 
         try {
-            const res = await fetch(`/api/user/status?telegram_id=${tgUser.id}`);
+            const res = await fetch(`/api/user/status`, {
+                headers: { 'X-Telegram-Init-Data': tg.initData }
+            });
             if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);
             const result = await res.json();
             isSubscribed = !!result.is_subscribed;
