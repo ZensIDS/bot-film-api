@@ -138,7 +138,7 @@ class MovieController extends Controller
 
     public function updateEpisode(Request $request, Movie $movie, Episode $episode)
     {
-        abort_unless($episode->movie_id === $movie->id, 404);
+        abort_unless($episode->movie_id == $movie->id, 404); // loose (==) sengaja: hindari false-404 kalau tipe data numeric beda representasi
 
         $data = $request->validate([
             'episode_number' => [
@@ -162,7 +162,7 @@ class MovieController extends Controller
 
     public function destroyEpisode(Movie $movie, Episode $episode)
     {
-        abort_unless($episode->movie_id === $movie->id, 404);
+        abort_unless($episode->movie_id == $movie->id, 404); // loose (==) sengaja: hindari false-404 kalau tipe data numeric beda representasi
 
         $number = $episode->episode_number;
         $episode->delete();

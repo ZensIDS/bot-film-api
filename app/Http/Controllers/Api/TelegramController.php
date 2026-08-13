@@ -249,12 +249,17 @@ class TelegramController extends Controller
      */
     private function syncTelegramUser($chatId, ?string $username, ?string $firstName): User
     {
-        // DEBUG SEMENTARA: catat nilai chat_id persis sebelum dipakai query/create,
-        // termasuk tipe datanya di PHP (string/int/float), buat lacak di titik mana
-        // (kalau ada) nilainya berubah dari yang diharapkan.
+        // Paksa jadi string bersih di titik SATU-SATUNYA sebelum menyentuh DB, apa pun tipe
+        // aslinya (int, string dari JSON_BIGINT_AS_STRING, dst). Ini defensif khusus buat
+        // hosting ini yang diketahui PHP_INT_SIZE=4 (32-bit) — di lingkungan begini, ID
+        // Telegram besar sangat rawan berubah kalau lewat casting int di mana pun sebelum
+        // titik ini. trim() jaga-jaga ada whitespace tak kasat mata ikut kebawa.
+        $chatId = trim((string) $chatId);
+
         Log::info('syncTelegramUser dipanggil', [
             'chatId_value' => $chatId,
             'chatId_type' => gettype($chatId),
+            'chatId_length' => strlen($chatId),
         ]);
 
         $user = User::firstOrCreate(

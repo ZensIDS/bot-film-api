@@ -86,7 +86,7 @@ class VerifyTelegramInitData
             return response()->json(['message' => 'ID user Telegram tidak valid.'], 401);
         }
 
-        $telegramId = (string) $tgUserData['id'];
+        $telegramId = trim((string) $tgUserData['id']);
 
         // Auto-register/update user berdasarkan data Telegram yang sudah terverifikasi.
         // Ini juga menyelesaikan kasus user membuka TWA langsung tanpa pernah /start di bot dulu.
