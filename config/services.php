@@ -36,6 +36,9 @@ return [
         // Base URL Telegram Mini App (TWA), mis. https://xxxx.ngrok-free.app
         // Dipakai untuk tombol "Ruang Drama" dan link checkout dari bot.
         'webapp_url' => env('TELEGRAM_WEBAPP_URL'),
+        // Username bot tanpa "@", mis. "reel_gate_bot" -> https://t.me/reel_gate_bot
+        // Dipakai untuk generate deep link/share link kalau dibutuhkan fitur lain.
+        'bot_username' => env('TELEGRAM_BOT_USERNAME'),
         // Daftar chat_id (user pribadi maupun channel) yang boleh pakai fitur ambil
         // telegram_file_id otomatis dari video yang dikirim/di-post ke bot, dipisah koma.
         // Contoh: TELEGRAM_ADMIN_IDS=111111111,-1001234567890

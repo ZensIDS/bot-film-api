@@ -83,7 +83,7 @@ class TelegramController extends Controller
                     // request sendMessage (error 400: can't parse entities), sehingga /start terlihat
                     // seperti tidak membalas sama sekali.
                     $replyText = "Halo {$firstName}! 👋\n\n"
-                        . "Selamat datang di *NiceDramaBot*! 🍿\n"
+                        . "Selamat datang di *REELGATE*! 🍿\n"
                         . "Nikmati akses streaming berbagai drama & film eksklusif pilihan.\n\n"
                         . "Silakan pilih menu di bawah ini untuk memulai:";
 
@@ -139,11 +139,11 @@ class TelegramController extends Controller
 
                 if (str_starts_with($text, '/start')) {
                     if ($this->isWhitelistedAdmin($chatId)) {
-                        $replyText = "🤖 *NiceDramaBot* aktif di *{$chatTitle}*.\n\n"
+                        $replyText = "🤖 *REELGATE* aktif di *{$chatTitle}*.\n\n"
                             . "Chat ID channel ini (`{$chatId}`) sudah terdaftar sebagai admin ✅\n"
                             . "Kirim/post video ke channel ini kapan saja untuk mengambil Telegram File ID-nya.";
                     } else {
-                        $replyText = "🤖 *NiceDramaBot* berhasil terhubung ke *{$chatTitle}*.\n\n"
+                        $replyText = "🤖 *REELGATE* berhasil terhubung ke *{$chatTitle}*.\n\n"
                             . "Chat ID channel ini:\n`{$chatId}`\n\n"
                             . "Kalau ingin bot bisa membaca video yang di-post di sini untuk diambil Telegram File ID-nya, "
                             . "tambahkan Chat ID di atas ke daftar `TELEGRAM_ADMIN_IDS` pada file `.env` (pisahkan dengan koma jika lebih dari satu), lalu jalankan `php artisan config:clear` di server dan kirim `/start` lagi di sini.";

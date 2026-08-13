@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>@yield('title', 'Admin') - NiceDramaBot</title>
+    <title>@yield('title', 'Admin') - REELGATE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -38,7 +38,7 @@
     <aside class="hidden md:flex w-60 shrink-0 flex-col bg-[var(--surface)] border-r border-[var(--hairline)] min-h-screen sticky top-0">
         <div class="px-5 py-5 border-b border-[var(--hairline)]">
             <h1 class="font-display text-lg font-semibold text-white">
-                Nice<span style="color:var(--gold)">Drama</span>Bot
+                REEL<span style="color:var(--gold)">GATE</span>
             </h1>
             <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mt-0.5">Admin Panel</p>
         </div>
@@ -85,7 +85,7 @@
     <!-- Main content -->
     <div class="flex-1 min-w-0">
         <header class="md:hidden flex items-center justify-between px-4 py-3 bg-[var(--surface)] border-b border-[var(--hairline)]">
-            <h1 class="font-display text-base font-semibold text-white">Nice<span style="color:var(--gold)">Drama</span>Bot</h1>
+            <h1 class="font-display text-base font-semibold text-white">REEL<span style="color:var(--gold)">GATE</span></h1>
             <form action="{{ route('admin.logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="text-xs text-[var(--text-muted)]">Keluar</button>

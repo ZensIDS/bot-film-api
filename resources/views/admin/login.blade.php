@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Admin - NiceDramaBot</title>
+    <title>Login Admin - REELGATE</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -66,7 +66,7 @@
 
         <div class="text-center mb-8">
             <h1 class="font-display text-2xl font-semibold text-white">
-                Nice<span style="color:var(--gold)">Drama</span>Bot
+                REEL<span style="color:var(--gold)">GATE</span>
             </h1>
             <p class="text-xs text-[var(--text-muted)] mt-1 tracking-wide uppercase">Admin Panel</p>
         </div>
@@ -107,7 +107,7 @@
         </div>
 
         <p class="text-center text-[11px] text-[var(--text-muted)] mt-6">
-            &copy; {{ date('Y') }} NiceDramaBot &middot; Internal Admin Only
+            &copy; {{ date('Y') }} REELGATE &middot; Internal Admin Only
         </p>
     </div>
 </body>
