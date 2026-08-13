@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ruang Drama - NiceDramaBot</title>
+    <title>REELGATE</title>
 
     <!-- ⚡ SDK Resmi Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -203,7 +203,7 @@
                         <span class="text-xs">📢</span>
                         <div class="marquee-container flex-1 text-xs text-[var(--gold-soft)] font-medium">
                             <div class="marquee-content">
-                                Selamat datang di NiceDramaBot! Nikmati pembaruan episode drama favorit Anda setiap harinya. Gunakan paket VIP untuk bebas iklan dan streaming tanpa batas.
+                                Selamat datang di REELGATE! Nikmati pembaruan episode drama favorit Anda setiap harinya. Gunakan paket VIP untuk bebas iklan dan streaming tanpa batas.
                             </div>
                         </div>
                     </div>
@@ -212,7 +212,7 @@
                     <div class="spotlight flex items-start justify-between mb-4">
                         <div class="relative z-10">
                             <p id="greeting" class="text-xs text-[var(--text-muted)] mb-1">Selamat datang kembali</p>
-                            <h1 class="font-display text-3xl font-semibold tracking-tight">Ruang Drama</h1>
+                            <h1 class="font-display text-3xl font-semibold tracking-tight">REELGATE</h1>
                         </div>
                         <span id="vip-badge-home" class="badge-vip text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap mt-1 relative z-10">VIP AKTIF</span>
                     </div>

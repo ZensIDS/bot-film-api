@@ -92,7 +92,7 @@ class TelegramController extends Controller
                     $keyboard = [
                         'inline_keyboard' => [
                             [
-                                ['text' => '🎬 Ruang Drama', 'web_app' => ['url' => $webAppUrl]]
+                                ['text' => '🎬 REELGATE', 'web_app' => ['url' => $webAppUrl]]
                             ],
                             [
                                 ['text' => '📊 Status Langganan', 'callback_data' => 'check_status']
