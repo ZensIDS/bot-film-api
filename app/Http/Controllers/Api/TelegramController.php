@@ -14,7 +14,16 @@ class TelegramController extends Controller
     public function handleWebhook(Request $request)
     {
         try {
-            $update = $request->all();
+            // PENTING: JANGAN pakai $request->all() untuk update Telegram.
+            // ID Telegram (chat.id, from.id) sekarang bisa >2.147.483.647 (di luar batas
+            // integer 32-bit). $request->all() mem-parsing JSON lewat json_decode() versi
+            // default, yang membiarkan PHP bebas memilih representasi angka besar — begitu
+            // nilai itu nyasar lewat konversi/parameter bertipe int di suatu tempat, angka
+            // besar seperti 8745282259 bisa overflow/wrap jadi 155347667 (persis kasus yang
+            // ditemukan: 8745282259 % 2^32 = 155347667). Dengan flag JSON_BIGINT_AS_STRING,
+            // semua angka yang melebihi batas integer PHP dipaksa jadi STRING sejak awal,
+            // jadi tidak akan pernah tersentuh casting integer di mana pun sepanjang alur.
+            $update = json_decode($request->getContent(), true, 512, JSON_BIGINT_AS_STRING) ?? [];
             Log::info('Telegram Update Received:', $update);
 
             // 1. Handling Callback Query (Klik Tombol Inline)

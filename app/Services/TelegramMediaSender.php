@@ -20,7 +20,7 @@ class TelegramMediaSender
      *
      * @return array{ok: bool, message: string}
      */
-    public static function sendEpisode(int $telegramChatId, Movie $movie, ?Episode $episode = null): array
+    public static function sendEpisode(string $telegramChatId, Movie $movie, ?Episode $episode = null): array
     {
         $user = self::authorizeOrNotify($telegramChatId);
         if (!$user) {
@@ -74,7 +74,7 @@ class TelegramMediaSender
      * Pastikan user (berdasarkan chat_id Telegram) statusnya VIP aktif.
      * Kalau tidak, langsung kirim notice + tombol buka TWA untuk beli paket, lalu return null.
      */
-    private static function authorizeOrNotify(int $telegramChatId): ?User
+    private static function authorizeOrNotify(string $telegramChatId): ?User
     {
         $user = User::where('telegram_id', $telegramChatId)->first();
         $isActive = $user && $user->is_subscribed && $user->expired_at && $user->expired_at->isFuture();
@@ -138,7 +138,7 @@ class TelegramMediaSender
         return ['inline_keyboard' => [$buttons]];
     }
 
-    private static function sendMessage(int $chatId, string $text): void
+    private static function sendMessage(string $chatId, string $text): void
     {
         $token = config('services.telegram.bot_token');
         if (!$token) {

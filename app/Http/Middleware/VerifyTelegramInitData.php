@@ -73,7 +73,7 @@ class VerifyTelegramInitData
             return response()->json(['message' => 'Data user Telegram tidak ditemukan di initData.'], 401);
         }
 
-        $tgUserData = json_decode($parsed['user'], true);
+        $tgUserData = json_decode($parsed['user'], true, 512, JSON_BIGINT_AS_STRING);
 
         if (!isset($tgUserData['id'])) {
             return response()->json(['message' => 'ID user Telegram tidak valid.'], 401);
