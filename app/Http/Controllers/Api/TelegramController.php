@@ -14,6 +14,15 @@ class TelegramController extends Controller
     public function handleWebhook(Request $request)
     {
         try {
+            // DEBUG SEMENTARA: catat body mentah persis seperti dikirim Telegram, sebelum
+            // disentuh decode/casting apa pun, plus ukuran integer PHP di server ini.
+            // Ini buat memastikan betul-betul di titik mana angka chat.id berubah.
+            Log::info('RAW webhook body', [
+                'raw_body' => $request->getContent(),
+                'PHP_INT_SIZE' => PHP_INT_SIZE,
+                'PHP_INT_MAX' => PHP_INT_MAX,
+            ]);
+
             // PENTING: JANGAN pakai $request->all() untuk update Telegram.
             // ID Telegram (chat.id, from.id) sekarang bisa >2.147.483.647 (di luar batas
             // integer 32-bit). $request->all() mem-parsing JSON lewat json_decode() versi
@@ -240,6 +249,14 @@ class TelegramController extends Controller
      */
     private function syncTelegramUser($chatId, ?string $username, ?string $firstName): User
     {
+        // DEBUG SEMENTARA: catat nilai chat_id persis sebelum dipakai query/create,
+        // termasuk tipe datanya di PHP (string/int/float), buat lacak di titik mana
+        // (kalau ada) nilainya berubah dari yang diharapkan.
+        Log::info('syncTelegramUser dipanggil', [
+            'chatId_value' => $chatId,
+            'chatId_type' => gettype($chatId),
+        ]);
+
         $user = User::firstOrCreate(
             ['telegram_id' => $chatId],
             [

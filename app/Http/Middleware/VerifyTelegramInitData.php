@@ -29,6 +29,13 @@ class VerifyTelegramInitData
             return response()->json(['message' => 'initData Telegram tidak ditemukan.'], 401);
         }
 
+        // DEBUG SEMENTARA: catat initData mentah persis seperti dikirim TWA, sebelum
+        // di-parse sama sekali, buat dibandingkan langsung dengan raw_body di webhook bot.
+        Log::info('RAW initData TWA', [
+            'raw_init_data' => $initData,
+            'PHP_INT_SIZE' => PHP_INT_SIZE,
+        ]);
+
         parse_str($initData, $parsed);
 
         if (!isset($parsed['hash'])) {
