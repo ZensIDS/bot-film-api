@@ -97,6 +97,9 @@ Route::get('/movies/{movie}', function (\App\Models\Movie $movie) {
     ]);
 });
 
+// Tombol "Tonton Sekarang" di movie-detail.blade.php -> kirim video ke chat Telegram user
+Route::middleware('telegram.auth')->post('/movies/{movie}/watch', [\App\Http\Controllers\Api\WatchController::class, 'send']);
+
 // Request judul film baru (hanya untuk user yang berlangganan aktif)
 Route::middleware('telegram.auth')->post('/movie-requests', [MovieRequestController::class, 'store']);
 

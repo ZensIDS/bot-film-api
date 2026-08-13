@@ -47,6 +47,21 @@ class TelegramController extends Controller
                     $packageId = str_replace('buy_package_', '', $callbackData);
                     $this->sendCheckoutLink($chatId, $packageId);
                 }
+
+                // Tombol navigasi episode di bawah video ("watch:{movie_id}:{episode_id}"),
+                // supaya user bisa lanjut nonton tanpa harus balik ke TWA setiap episode.
+                // Status VIP dicek ulang di dalam TelegramMediaSender::sendEpisode setiap kali
+                // tombol ini ditekan, bukan cuma sekali di awal.
+                elseif (str_starts_with($callbackData, 'watch:')) {
+                    [, $movieId, $episodeId] = array_pad(explode(':', $callbackData), 3, null);
+
+                    $movie = \App\Models\Movie::find($movieId);
+                    $episode = $episodeId ? \App\Models\Episode::find($episodeId) : null;
+
+                    if ($movie) {
+                        \App\Services\TelegramMediaSender::sendEpisode($chatId, $movie, $episode);
+                    }
+                }
             }
 
             // 2. Handling Pesan Teks Normal / Command (/start, /status, /paket)
