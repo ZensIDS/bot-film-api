@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -76,6 +77,17 @@ class UserController extends Controller
             'expired_at' => $base->copy()->addMinutes($totalMinutes),
         ]);
 
+        // Jejak audit: buat lacak kalau ada laporan "sudah di-extend tapi statusnya tidak sesuai"
+        // -- bandingkan user_id/telegram_id di sini dengan chat_id yang dicatat saat /status dicek.
+        Log::info('Admin extend VIP', [
+            'user_id' => $user->id,
+            'telegram_id' => $user->telegram_id,
+            'username' => $user->username,
+            'amount' => $data['amount'],
+            'unit' => $data['unit'],
+            'expired_at' => $user->expired_at->toDateTimeString(),
+        ]);
+
         $unitLabel = [
             'minutes' => 'menit',
             'hours' => 'jam',
@@ -95,6 +107,12 @@ class UserController extends Controller
         $user->update([
             'is_subscribed' => false,
             'expired_at' => null,
+        ]);
+
+        Log::info('Admin revoke VIP', [
+            'user_id' => $user->id,
+            'telegram_id' => $user->telegram_id,
+            'username' => $user->username,
         ]);
 
         return redirect()

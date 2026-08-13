@@ -22,10 +22,18 @@ class TelegramController extends Controller
                 $callbackQuery = $update['callback_query'];
                 $callbackQueryId = $callbackQuery['id'];
                 $chatId = $callbackQuery['message']['chat']['id'];
+                $chatType = $callbackQuery['message']['chat']['type'] ?? 'private';
                 $callbackData = $callbackQuery['data'] ?? '';
 
                 // Hilangkan indikator loading di tombol Telegram secara instan
                 $this->answerCallbackQuery($callbackQueryId);
+
+                // Sama seperti guard di handler pesan teks: abaikan kalau tombol ini entah
+                // bagaimana berasal dari grup (chat.id negatif), supaya tidak ikut membuat/
+                // mengubah baris user dengan telegram_id yang sebenarnya adalah ID grup.
+                if ($chatType !== 'private') {
+                    return response()->json(['status' => 'success'], 200);
+                }
 
                 // Sinkronkan username/first_name terbaru tiap kali user berinteraksi lewat tombol,
                 // sama seperti yang sudah dilakukan VerifyTelegramInitData di sisi TWA. Data ini
@@ -37,6 +45,17 @@ class TelegramController extends Controller
                 // Jika user klik tombol Status Langganan
                 if ($callbackData === 'check_status') {
                     $user = User::where('telegram_id', $chatId)->first();
+
+                    // Jejak audit: bandingkan chat_id & user_id di sini dengan log "Admin extend VIP"
+                    // kalau ada laporan status tidak sinkron antara admin/TWA vs bot.
+                    Log::info('Cek status via tombol', [
+                        'chat_id' => $chatId,
+                        'user_id' => $user->id ?? null,
+                        'telegram_id_di_db' => $user->telegram_id ?? 'NOT_FOUND',
+                        'is_subscribed' => $user->is_subscribed ?? null,
+                        'expired_at' => $user->expired_at ? $user->expired_at->toDateTimeString() : null,
+                    ]);
+
                     $statusText = ($user && $user->is_subscribed && $user->expired_at && $user->expired_at->isFuture())
                         ? "✅ Status Langganan: *AKTIF*\nExpired: " . $user->expired_at->format('d M Y H:i') . " WIB"
                         : "❌ Status Langganan: *TIDAK AKTIF*\nSilakan pilih paket langganan terlebih dahulu.";
@@ -75,6 +94,19 @@ class TelegramController extends Controller
             elseif (isset($update['message'])) {
                 $message = $update['message'];
                 $chatId = $message['chat']['id'];
+                $chatType = $message['chat']['type'] ?? 'private';
+
+                // PENTING: hanya proses pesan dari chat PRIBADI (1-on-1 dengan bot).
+                // Kalau bot di-invite ke grup dan seseorang ketik /start atau command lain di
+                // sana, Telegram tetap mengirimnya sebagai update 'message' (bukan 'channel_post'
+                // — itu cuma untuk channel), dengan chat.id berupa ID GRUP (angka negatif),
+                // bukan ID user. Tanpa guard ini, baris di bawah bisa membuat baris "user" palsu
+                // di tabel users: telegram_id = ID grup (negatif), tapi username = username
+                // pengirim asli — bikin data user jadi campur aduk / kelihatan duplikat.
+                if ($chatType !== 'private') {
+                    return response()->json(['status' => 'success'], 200);
+                }
+
                 $text = $message['text'] ?? '';
                 $username = $message['from']['username'] ?? null;
                 $firstName = $message['from']['first_name'] ?? 'User';
@@ -121,6 +153,17 @@ class TelegramController extends Controller
 
                 // Command /status
                 elseif ($text === '/status') {
+                    // Jejak audit: bandingkan chat_id & user_id di sini dengan log "Admin extend VIP"
+                    // kalau ada laporan status tidak sinkron antara admin/TWA vs bot.
+                    Log::info('Cek status via /status', [
+                        'chat_id' => $chatId,
+                        'user_id' => $user->id,
+                        'telegram_id_di_db' => $user->telegram_id,
+                        'username_di_db' => $user->username,
+                        'is_subscribed' => $user->is_subscribed,
+                        'expired_at' => $user->expired_at ? $user->expired_at->toDateTimeString() : null,
+                    ]);
+
                     $statusText = $user->is_subscribed && $user->expired_at && $user->expired_at->isFuture()
                         ? "✅ Status Langganan: *AKTIF*\nExpired: " . $user->expired_at->format('d M Y H:i') . " WIB"
                         : "❌ Status Langganan: *TIDAK AKTIF*\nSilakan beli paket langganan terlebih dahulu.";
