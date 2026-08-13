@@ -17,7 +17,7 @@ class SetTelegramWebhook extends Command
 
     public function handle()
     {
-        $token = env('TELEGRAM_BOT_TOKEN');
+        $token = config('services.telegram.bot_token');
 
         if (!$token) {
             $this->error('TELEGRAM_BOT_TOKEN belum diset di .env.');

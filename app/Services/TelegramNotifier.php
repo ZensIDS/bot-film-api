@@ -14,7 +14,7 @@ class TelegramNotifier
      */
     public static function send($chatId, string $text): bool
     {
-        $token = env('TELEGRAM_BOT_TOKEN');
+        $token = config('services.telegram.bot_token');
 
         if (!$token) {
             Log::error('TELEGRAM_BOT_TOKEN belum diset di .env, notifikasi dibatalkan.');

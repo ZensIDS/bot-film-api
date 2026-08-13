@@ -138,10 +138,16 @@ class TelegramController extends Controller
                 }
 
                 if (str_starts_with($text, '/start')) {
-                    $replyText = "🤖 *NiceDramaBot* berhasil terhubung ke *{$chatTitle}*.\n\n"
-                        . "Chat ID channel ini:\n`{$chatId}`\n\n"
-                        . "Kalau ingin bot bisa membaca video yang di-post di sini untuk diambil Telegram File ID-nya, "
-                        . "tambahkan Chat ID di atas ke daftar `TELEGRAM_ADMIN_IDS` pada file `.env` (pisahkan dengan koma jika lebih dari satu), lalu restart aplikasi.";
+                    if ($this->isWhitelistedAdmin($chatId)) {
+                        $replyText = "🤖 *NiceDramaBot* aktif di *{$chatTitle}*.\n\n"
+                            . "Chat ID channel ini (`{$chatId}`) sudah terdaftar sebagai admin ✅\n"
+                            . "Kirim/post video ke channel ini kapan saja untuk mengambil Telegram File ID-nya.";
+                    } else {
+                        $replyText = "🤖 *NiceDramaBot* berhasil terhubung ke *{$chatTitle}*.\n\n"
+                            . "Chat ID channel ini:\n`{$chatId}`\n\n"
+                            . "Kalau ingin bot bisa membaca video yang di-post di sini untuk diambil Telegram File ID-nya, "
+                            . "tambahkan Chat ID di atas ke daftar `TELEGRAM_ADMIN_IDS` pada file `.env` (pisahkan dengan koma jika lebih dari satu), lalu jalankan `php artisan config:clear` di server dan kirim `/start` lagi di sini.";
+                    }
 
                     $this->sendMessage($chatId, $replyText);
                 }
@@ -214,7 +220,7 @@ class TelegramController extends Controller
      */
     private function isWhitelistedAdmin($chatId): bool
     {
-        $adminIds = array_filter(array_map('trim', explode(',', (string) env('TELEGRAM_ADMIN_IDS', ''))));
+        $adminIds = array_filter(array_map('trim', explode(',', (string) config('services.telegram.admin_ids', ''))));
 
         return in_array((string) $chatId, $adminIds, true);
     }
@@ -259,7 +265,7 @@ class TelegramController extends Controller
 
     private function sendMessage($chatId, $text)
     {
-        $token = env('TELEGRAM_BOT_TOKEN');
+        $token = config('services.telegram.bot_token');
         if (!$token) {
             Log::error('TELEGRAM_BOT_TOKEN belum diset di .env, sendMessage dibatalkan.');
             return;
@@ -278,7 +284,7 @@ class TelegramController extends Controller
 
     private function sendMessageWithKeyboard($chatId, $text, array $keyboard)
     {
-        $token = env('TELEGRAM_BOT_TOKEN');
+        $token = config('services.telegram.bot_token');
         if (!$token) {
             Log::error('TELEGRAM_BOT_TOKEN belum diset di .env, sendMessageWithKeyboard dibatalkan.');
             return;
@@ -298,7 +304,7 @@ class TelegramController extends Controller
 
     private function answerCallbackQuery($callbackQueryId)
     {
-        $token = env('TELEGRAM_BOT_TOKEN');
+        $token = config('services.telegram.bot_token');
         if (!$token) return;
 
         $response = Http::post("https://api.telegram.org/bot{$token}/answerCallbackQuery", [
