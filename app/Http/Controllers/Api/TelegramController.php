@@ -27,6 +27,13 @@ class TelegramController extends Controller
                 // Hilangkan indikator loading di tombol Telegram secara instan
                 $this->answerCallbackQuery($callbackQueryId);
 
+                // Sinkronkan username/first_name terbaru tiap kali user berinteraksi lewat tombol,
+                // sama seperti yang sudah dilakukan VerifyTelegramInitData di sisi TWA. Data ini
+                // ('from') selalu tersedia di setiap callback_query, jadi dipakai juga di sini.
+                $callbackUsername = $callbackQuery['from']['username'] ?? null;
+                $callbackFirstName = $callbackQuery['from']['first_name'] ?? 'User';
+                $this->syncTelegramUser($chatId, $callbackUsername, $callbackFirstName);
+
                 // Jika user klik tombol Status Langganan
                 if ($callbackData === 'check_status') {
                     $user = User::where('telegram_id', $chatId)->first();
@@ -80,15 +87,9 @@ class TelegramController extends Controller
                     return response()->json(['status' => 'success'], 200);
                 }
 
-                // Simpan / Update User ke Database MySQL
-                $user = User::firstOrCreate(
-                    ['telegram_id' => $chatId],
-                    [
-                        'username' => $username,
-                        'first_name' => $firstName,
-                        'is_subscribed' => false,
-                    ]
-                );
+                // Simpan / Update User ke Database MySQL, sekaligus sinkronkan username/first_name
+                // terbaru kalau user sudah pernah ganti username sebelumnya (lihat syncTelegramUser()).
+                $user = $this->syncTelegramUser($chatId, $username, $firstName);
 
                 // Command /start
                 if (str_starts_with($text, '/start')) {
@@ -172,6 +173,38 @@ class TelegramController extends Controller
         }
 
         return response()->json(['status' => 'success'], 200);
+    }
+
+    /**
+     * Cari/buat User berdasarkan telegram_id (chat_id), lalu sinkronkan kolom
+     * username & first_name kalau ada perubahan dari data Telegram terbaru.
+     *
+     * PENTING: pencocokan user SELALU pakai telegram_id (chat_id numerik dari Telegram,
+     * tidak pernah berubah), bukan username. Jadi status VIP tidak akan pernah "hilang"
+     * gara-gara user ganti username. Sinkronisasi username di sini hanya supaya kolom
+     * `username` di tabel admin (dipakai buat pencarian di halaman Manajemen User) selalu
+     * menampilkan username yang terbaru, sama seperti yang sudah berjalan di TWA lewat
+     * VerifyTelegramInitData.
+     */
+    private function syncTelegramUser($chatId, ?string $username, ?string $firstName): User
+    {
+        $user = User::firstOrCreate(
+            ['telegram_id' => $chatId],
+            [
+                'username' => $username,
+                'first_name' => $firstName,
+                'is_subscribed' => false,
+            ]
+        );
+
+        if ($username !== $user->username || ($firstName && $firstName !== $user->first_name)) {
+            $user->update([
+                'username' => $username ?? $user->username,
+                'first_name' => $firstName ?? $user->first_name,
+            ]);
+        }
+
+        return $user;
     }
 
     private function sendPackageList($chatId)
