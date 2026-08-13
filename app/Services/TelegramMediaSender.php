@@ -111,10 +111,12 @@ class TelegramMediaSender
     }
 
     /**
-     * Susun tombol navigasi di bawah video:
-     * - Episode Selanjutnya (kalau ada) -> callback_data "watch:{movie_id}:{episode_id}"
-     * - Ulangi Episode Ini -> callback_data "watch:{movie_id}:{episode_id}"
-     * Film tipe single tidak dikasih tombol navigasi (cuma satu file, tidak ada "next").
+     * Susun tombol navigasi di bawah video: SEMUA episode setelah yang baru dikirim,
+     * masing-masing jadi baris tombol sendiri (bukan cuma "Episode Selanjutnya" + "Ulangi").
+     * Contoh: abis kirim Episode 1 -> tombol Episode 2, 3, 4, dst muncul semua di bawahnya.
+     * Abis user klik Episode 2 -> pesan baru muncul dengan tombol Episode 3, 4, dst (episode
+     * 1 & 2 otomatis tidak ditampilkan lagi karena sudah lewat).
+     * Film tipe single tidak dikasih tombol navigasi (cuma satu file, tidak ada episode lain).
      */
     private static function buildKeyboard(Movie $movie, ?Episode $episode): ?array
     {
@@ -122,20 +124,22 @@ class TelegramMediaSender
             return null;
         }
 
-        $next = Episode::where('movie_id', $movie->id)
+        $upcoming = Episode::where('movie_id', $movie->id)
             ->where('episode_number', '>', $episode->episode_number)
             ->orderBy('episode_number')
-            ->first();
+            ->limit(20) // batasi biar keyboard tidak kepanjangan untuk series yang episodenya puluhan
+            ->get();
 
-        $buttons = [];
-
-        if ($next) {
-            $buttons[] = ['text' => "▶️ Episode {$next->episode_number}", 'callback_data' => "watch:{$movie->id}:{$next->id}"];
+        if ($upcoming->isEmpty()) {
+            return null;
         }
 
-        $buttons[] = ['text' => '🔁 Ulangi Episode Ini', 'callback_data' => "watch:{$movie->id}:{$episode->id}"];
+        $rows = $upcoming->map(function (Episode $ep) use ($movie) {
+            $label = "▶️ Episode {$ep->episode_number}" . ($ep->title ? " — {$ep->title}" : '');
+            return [['text' => $label, 'callback_data' => "watch:{$movie->id}:{$ep->id}"]];
+        })->toArray();
 
-        return ['inline_keyboard' => [$buttons]];
+        return ['inline_keyboard' => $rows];
     }
 
     private static function sendMessage(string $chatId, string $text): void

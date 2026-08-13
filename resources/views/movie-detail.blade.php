@@ -255,10 +255,10 @@
 
             if (!res.ok) throw new Error(result.message || 'Gagal mengirim video.');
 
-            // Setelah video pertama terkirim, episode selanjutnya bisa langsung diakses
-            // lewat tombol "▶️ Episode Selanjutnya" di bawah video dalam chat Telegram —
-            // jadi user tidak perlu balik ke TWA setiap ganti episode.
-            tg.showAlert('Video sudah dikirim ke chat Telegram-mu! Buka chat bot untuk mulai nonton — episode selanjutnya bisa langsung dari tombol di bawah video.');
+            // Auto-close TWA supaya user langsung balik ke chat bot (video + tombol episode
+            // selanjutnya sudah menunggu di sana). Tidak pakai showAlert lagi karena itu
+            // modal yang harus di-dismiss manual dulu, menghalangi TWA tertutup otomatis.
+            tg.close();
         } catch (err) {
             errorEl.textContent = err.message || 'Gagal mengirim video, coba lagi ya.';
             errorEl.classList.remove('hidden');

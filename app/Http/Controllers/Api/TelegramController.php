@@ -58,53 +58,69 @@ class TelegramController extends Controller
                 // ('from') selalu tersedia di setiap callback_query, jadi dipakai juga di sini.
                 $callbackUsername = $callbackQuery['from']['username'] ?? null;
                 $callbackFirstName = $callbackQuery['from']['first_name'] ?? 'User';
-                $this->syncTelegramUser($chatId, $callbackUsername, $callbackFirstName);
+                $currentUser = $this->syncTelegramUser($chatId, $callbackUsername, $callbackFirstName);
 
-                // Jika user klik tombol Status Langganan
-                if ($callbackData === 'check_status') {
-                    $user = User::where('telegram_id', $chatId)->first();
+                try {
+                    // Jika user klik tombol Status Langganan
+                    if ($callbackData === 'check_status') {
+                        // PENTING: pakai $currentUser yang SUDAH di-resolve syncTelegramUser() di atas
+                        // (telegram_id-nya sudah melalui trim/cast yang konsisten), BUKAN query baru
+                        // pakai $chatId mentah — sebelumnya ini dua sumber berbeda dan bisa gagal cocok,
+                        // yang membuat tombol ini terlihat "tidak merespons" (loading hilang tapi pesan
+                        // balasan tidak pernah terkirim karena exception atau silent-null di tengah jalan).
+                        $user = $currentUser;
 
-                    // Jejak audit: bandingkan chat_id & user_id di sini dengan log "Admin extend VIP"
-                    // kalau ada laporan status tidak sinkron antara admin/TWA vs bot.
-                    Log::info('Cek status via tombol', [
-                        'chat_id' => $chatId,
-                        'user_id' => $user->id ?? null,
-                        'telegram_id_di_db' => $user->telegram_id ?? 'NOT_FOUND',
-                        'is_subscribed' => $user->is_subscribed ?? null,
-                        'expired_at' => $user->expired_at ? $user->expired_at->toDateTimeString() : null,
-                    ]);
+                        Log::info('Cek status via tombol', [
+                            'chat_id' => $chatId,
+                            'user_id' => $user->id ?? null,
+                            'telegram_id_di_db' => $user->telegram_id ?? 'NOT_FOUND',
+                            'is_subscribed' => $user->is_subscribed ?? null,
+                            'expired_at' => $user->expired_at ? $user->expired_at->toDateTimeString() : null,
+                        ]);
 
-                    $statusText = ($user && $user->is_subscribed && $user->expired_at && $user->expired_at->isFuture())
-                        ? "✅ Status Langganan: *AKTIF*\nExpired: " . $user->expired_at->format('d M Y H:i') . " WIB"
-                        : "❌ Status Langganan: *TIDAK AKTIF*\nSilakan pilih paket langganan terlebih dahulu.";
+                        $statusText = ($user && $user->is_subscribed && $user->expired_at && $user->expired_at->isFuture())
+                            ? "✅ Status Langganan: *AKTIF*\nExpired: " . $user->expired_at->format('d M Y H:i') . " WIB"
+                            : "❌ Status Langganan: *TIDAK AKTIF*\nSilakan pilih paket langganan terlebih dahulu.";
 
-                    $this->sendMessage($chatId, $statusText);
-                }
-
-                // Jika user klik tombol Pilihan Paket
-                elseif ($callbackData === 'view_packages') {
-                    $this->sendPackageList($chatId);
-                }
-
-                // Jika user memilih paket langganan tertentu (buy_package_{id})
-                elseif (str_starts_with($callbackData, 'buy_package_')) {
-                    $packageId = str_replace('buy_package_', '', $callbackData);
-                    $this->sendCheckoutLink($chatId, $packageId);
-                }
-
-                // Tombol navigasi episode di bawah video ("watch:{movie_id}:{episode_id}"),
-                // supaya user bisa lanjut nonton tanpa harus balik ke TWA setiap episode.
-                // Status VIP dicek ulang di dalam TelegramMediaSender::sendEpisode setiap kali
-                // tombol ini ditekan, bukan cuma sekali di awal.
-                elseif (str_starts_with($callbackData, 'watch:')) {
-                    [, $movieId, $episodeId] = array_pad(explode(':', $callbackData), 3, null);
-
-                    $movie = \App\Models\Movie::find($movieId);
-                    $episode = $episodeId ? \App\Models\Episode::find($episodeId) : null;
-
-                    if ($movie) {
-                        \App\Services\TelegramMediaSender::sendEpisode($chatId, $movie, $episode);
+                        $this->sendMessage($chatId, $statusText);
                     }
+
+                    // Jika user klik tombol Pilihan Paket
+                    elseif ($callbackData === 'view_packages') {
+                        $this->sendPackageList($chatId);
+                    }
+
+                    // Jika user memilih paket langganan tertentu (buy_package_{id})
+                    elseif (str_starts_with($callbackData, 'buy_package_')) {
+                        $packageId = str_replace('buy_package_', '', $callbackData);
+                        $this->sendCheckoutLink($chatId, $packageId);
+                    }
+
+                    // Tombol navigasi episode di bawah video ("watch:{movie_id}:{episode_id}"),
+                    // supaya user bisa lanjut nonton tanpa harus balik ke TWA setiap episode.
+                    // Status VIP dicek ulang di dalam TelegramMediaSender::sendEpisode setiap kali
+                    // tombol ini ditekan, bukan cuma sekali di awal.
+                    elseif (str_starts_with($callbackData, 'watch:')) {
+                        [, $movieId, $episodeId] = array_pad(explode(':', $callbackData), 3, null);
+
+                        $movie = \App\Models\Movie::find($movieId);
+                        $episode = $episodeId ? \App\Models\Episode::find($episodeId) : null;
+
+                        if ($movie) {
+                            \App\Services\TelegramMediaSender::sendEpisode($chatId, $movie, $episode);
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // Sebelumnya kalau ada error di sini, tombol terlihat "tidak merespons" sama
+                    // sekali (loading hilang karena answerCallbackQuery sudah dipanggil di awal,
+                    // tapi pesan balasan tidak pernah terkirim). Sekarang minimal user tetap dapat
+                    // notifikasi, dan errornya kecatat jelas di log untuk didiagnosis.
+                    Log::error('Gagal memproses callback_query', [
+                        'callback_data' => $callbackData,
+                        'chat_id' => $chatId,
+                        'error' => $e->getMessage(),
+                    ]);
+                    $this->sendMessage($chatId, "⚠️ Terjadi kendala saat memproses permintaanmu, coba lagi ya.");
                 }
             }
 
