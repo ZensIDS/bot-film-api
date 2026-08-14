@@ -301,6 +301,12 @@
                 <button onclick="switchTab('packages')" class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] text-[var(--gold-soft)] font-semibold py-3 rounded-xl text-xs flex items-center justify-center gap-2">
                     <span>💎</span> Kelola / Perpanjang Langganan
                 </button>
+
+                <!-- Tombol pin ke home screen HP, hanya tampil kalau client Telegram-nya support
+                     (Bot API 8.0+). Disembunyikan by default, dimunculkan lewat JS setelah dicek. -->
+                <button id="btn-add-home" onclick="handleAddToHomeScreen()" class="hidden w-full mt-3 bg-[var(--surface-2)] border border-[var(--hairline)] text-[var(--gold-soft)] font-semibold py-3 rounded-xl text-xs flex items-center justify-center gap-2">
+                    <span>📲</span> Tambahkan ke Layar Utama
+                </button>
             </div>
 
         </div>
@@ -356,6 +362,8 @@
         openInvoice: () => {},
         openLink: () => {},
         showAlert: (msg) => alert(msg),
+        addToHomeScreen: () => {},
+        isVersionAtLeast: () => false,
         initDataUnsafe: {}
     };
     tg.ready();
@@ -367,6 +375,46 @@
 
     function goToMovie(id){
         window.location.href = `/movie/${id}`;
+    }
+
+    /* --- Shortcut ke Home Screen HP (fitur native Telegram, Bot API 8.0+) --- */
+    function setupAddToHomeScreen(){
+        const btn = document.getElementById('btn-add-home');
+
+        // Method addToHomeScreen() cuma ada di Telegram versi client yang mendukung
+        // Bot API 8.0+. Kalau tidak didukung (client lama / dibuka lewat browser biasa),
+        // tombolnya tetap disembunyikan supaya tidak membingungkan user.
+        if (!tg.isVersionAtLeast || !tg.isVersionAtLeast('8.0')) {
+            return;
+        }
+
+        btn.classList.remove('hidden');
+
+        // Kalau tersedia, cek dulu status pin-nya (Bot API 8.0+) supaya tombol bisa
+        // disembunyikan/diubah teksnya kalau ternyata sudah pernah ditambahkan sebelumnya.
+        if (tg.checkHomeScreenStatus) {
+            tg.checkHomeScreenStatus((status) => {
+                if (status === 'added') {
+                    btn.innerHTML = `<span>✅</span> Sudah Ada di Layar Utama`;
+                    btn.disabled = true;
+                    btn.classList.add('opacity-60');
+                }
+            });
+        }
+
+        // Event ini terpicu setelah user selesai konfirmasi dialog "Tambahkan ke Layar Utama"
+        // di sisi Telegram, supaya tombolnya langsung update tanpa perlu buka ulang halaman.
+        if (tg.onEvent) {
+            tg.onEvent('homeScreenAdded', () => {
+                btn.innerHTML = `<span>✅</span> Sudah Ada di Layar Utama`;
+                btn.disabled = true;
+                btn.classList.add('opacity-60');
+            });
+        }
+    }
+
+    function handleAddToHomeScreen(){
+        tg.addToHomeScreen();
     }
 
     function renderDramaList(dramas){
@@ -511,6 +559,7 @@
 
             fetchMovies();
             fetchPackages();
+            setupAddToHomeScreen();
 
             const requestedTab = new URLSearchParams(window.location.search).get('tab');
             if (requestedTab === 'packages' || requestedTab === 'profile') {
