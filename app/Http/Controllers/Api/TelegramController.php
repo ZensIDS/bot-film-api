@@ -178,17 +178,13 @@ class TelegramController extends Controller
                     $keyboard = [
                         'inline_keyboard' => [
                             [
-                                ['text' => '🎬 REELGATE', 'web_app' => ['url' => $this->webAppUrl('/app')]]
+                                ['text' => '🎬 REELGATE', 'web_app' => ['url' => $this->webAppUrl('/app')]],
+                                ['text' => '📊 STATUS LANGGANAN', 'callback_data' => 'check_status']
                             ],
                             [
-                                ['text' => '📊 Status Langganan', 'callback_data' => 'check_status']
+                                ['text' => '🎥 REQUEST FILM', 'web_app' => ['url' => $this->webAppUrl('/request-film')]],
+                                ['text' => '📦 PILIH PAKET', 'web_app' => ['url' => $this->webAppUrl('/app?tab=packages')]]
                             ],
-                            [
-                                ['text' => '🎥 Request Film', 'web_app' => ['url' => $this->webAppUrl('/request-film')]]
-                            ],
-                            [
-                                ['text' => '📦 Lihat Paket', 'web_app' => ['url' => $this->webAppUrl('/app?tab=packages')]]
-                            ]
                         ]
                     ];
 
@@ -353,7 +349,7 @@ class TelegramController extends Controller
                 ],
                 [
                     ['text' => '🎥 REQUEST FILM', 'web_app' => ['url' => $this->webAppUrl('/request-film')]],
-                    ['text' => '📦 LIHAT PAKET', 'web_app' => ['url' => $this->webAppUrl('/app?tab=packages')]],
+                    ['text' => '📦 PILIH PAKET', 'web_app' => ['url' => $this->webAppUrl('/app?tab=packages')]],
                 ],
             ],
             'resize_keyboard' => true,
