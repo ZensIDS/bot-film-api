@@ -301,12 +301,6 @@
                 <button onclick="switchTab('packages')" class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] text-[var(--gold-soft)] font-semibold py-3 rounded-xl text-xs flex items-center justify-center gap-2">
                     <span>💎</span> Kelola / Perpanjang Langganan
                 </button>
-
-                <!-- Tombol pin ke home screen HP, hanya tampil kalau client Telegram-nya support
-                     (Bot API 8.0+). Disembunyikan by default, dimunculkan lewat JS setelah dicek. -->
-                <button id="btn-add-home" onclick="handleAddToHomeScreen()" class="hidden w-full mt-3 bg-[var(--surface-2)] border border-[var(--hairline)] text-[var(--gold-soft)] font-semibold py-3 rounded-xl text-xs flex items-center justify-center gap-2">
-                    <span>📲</span> Tambahkan ke Layar Utama
-                </button>
             </div>
 
         </div>
@@ -362,12 +356,6 @@
         openInvoice: () => {},
         openLink: () => {},
         showAlert: (msg) => alert(msg),
-        addToHomeScreen: () => {},
-        checkHomeScreenStatus: () => {},
-        onEvent: () => {},
-        isVersionAtLeast: () => false,
-        platform: 'unknown',
-        version: '-',
         initDataUnsafe: {}
     };
     tg.ready();
@@ -379,75 +367,6 @@
 
     function goToMovie(id){
         window.location.href = `/movie/${id}`;
-    }
-
-    /* --- Shortcut ke Home Screen HP (fitur native Telegram, Bot API 8.0+) --- */
-    function setupAddToHomeScreen(){
-        const btn = document.getElementById('btn-add-home');
-
-        // 'addToHomeScreen' cuma bekerja di client Telegram MOBILE (Android/iOS) — di
-        // Telegram Desktop/Web dia diam-diam tidak melakukan apa-apa. tg.platform
-        // mengembalikan 'android', 'ios', 'tdesktop', 'weba', 'webk', dst.
-        const isMobile = tg.platform === 'android' || tg.platform === 'ios';
-        const hasMethod = typeof tg.addToHomeScreen === 'function';
-        // Cek versi WebApp client-nya juga (bukan cuma keberadaan method-nya), karena di
-        // beberapa versi Telegram Android yang lebih lama, method ini SUDAH ADA di objek
-        // JS-nya tapi diam-diam tidak melakukan apa pun saat dipanggil (event-nya di-ignore
-        // oleh aplikasi native). Ini persis gejala "diklik tapi tidak ada respons apa pun".
-        const versionOk = typeof tg.isVersionAtLeast === 'function' ? tg.isVersionAtLeast('8.0') : true;
-
-        console.log('[AddToHomeScreen debug]', {
-            platform: tg.platform, version: tg.version, hasMethod, versionOk
-        });
-
-        if (!hasMethod || !isMobile) {
-            return; // bukan mobile / SDK terlalu lama sekali → sembunyikan total
-        }
-
-        btn.classList.remove('hidden');
-
-        if (!versionOk) {
-            // Method-nya ADA tapi versi client kemungkinan belum benar-benar mendukungnya.
-            // Daripada tombol terlihat "hidup" tapi diam saat ditekan, tombol dibuat terlihat
-            // nonaktif dan menjelaskan kenapa, sekaligus kasih info versi buat debugging.
-            btn.classList.add('opacity-60');
-            btn.onclick = () => tg.showAlert(
-                `Fitur ini butuh Telegram versi terbaru (Bot API 8.0+). Update aplikasi Telegram-mu dari Play Store, lalu buka lagi menu ini.\n\nVersi terdeteksi: ${tg.version || '-'}`
-            );
-            return;
-        }
-
-        // Kalau tersedia, cek dulu status pin-nya (Bot API 8.0+) supaya tombol bisa
-        // disembunyikan/diubah teksnya kalau ternyata sudah pernah ditambahkan sebelumnya.
-        if (tg.checkHomeScreenStatus) {
-            tg.checkHomeScreenStatus((status) => {
-                if (status === 'added') {
-                    btn.innerHTML = `<span>✅</span> Sudah Ada di Layar Utama`;
-                    btn.disabled = true;
-                    btn.classList.add('opacity-60');
-                }
-            });
-        }
-
-        // Event ini terpicu setelah user selesai konfirmasi dialog "Tambahkan ke Layar Utama"
-        // di sisi Telegram, supaya tombolnya langsung update tanpa perlu buka ulang halaman.
-        if (tg.onEvent) {
-            tg.onEvent('homeScreenAdded', () => {
-                btn.innerHTML = `<span>✅</span> Sudah Ada di Layar Utama`;
-                btn.disabled = true;
-                btn.classList.add('opacity-60');
-            });
-        }
-    }
-
-    function handleAddToHomeScreen(){
-        try {
-            tg.addToHomeScreen();
-        } catch (err) {
-            // Kalau client sudah lolos pengecekan platform tapi tetap gagal (mis. versi
-            // Telegram terlalu lama), kasih tahu user daripada diam saja.
-            tg.showAlert('Fitur ini butuh Telegram versi terbaru. Coba update aplikasi Telegram-mu dulu ya.');
-        }
     }
 
     function renderDramaList(dramas){
@@ -592,7 +511,6 @@
 
             fetchMovies();
             fetchPackages();
-            setupAddToHomeScreen();
 
             const requestedTab = new URLSearchParams(window.location.search).get('tab');
             if (requestedTab === 'packages' || requestedTab === 'profile') {
