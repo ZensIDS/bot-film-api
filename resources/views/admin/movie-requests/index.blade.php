@@ -1,11 +1,11 @@
-    @extends('admin.layout')
+@extends('admin.layout')
 
 @section('title', 'Request Film')
 @section('page_title', 'Pengelolaan Request Film')
 
 @section('content')
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-5">
     <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl p-5">
         <p class="text-xs text-[var(--text-muted)] mb-1">Menunggu Diproses</p>
         <p class="font-display text-2xl font-semibold text-yellow-300">{{ $recap['pending'] }}</p>
@@ -17,6 +17,10 @@
     <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl p-5">
         <p class="text-xs text-[var(--text-muted)] mb-1">Ditolak</p>
         <p class="font-display text-2xl font-semibold text-[#F27C97]">{{ $recap['rejected'] }}</p>
+    </div>
+    <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl p-5">
+        <p class="text-xs text-[var(--text-muted)] mb-1">Tayang</p>
+        <p class="font-display text-2xl font-semibold text-blue-300">{{ $recap['tayang'] }}</p>
     </div>
 </div>
 
@@ -35,6 +39,7 @@
             <option value="PENDING" {{ request('status') === 'PENDING' ? 'selected' : '' }}>Pending</option>
             <option value="APPROVED" {{ request('status') === 'APPROVED' ? 'selected' : '' }}>Approved</option>
             <option value="REJECTED" {{ request('status') === 'REJECTED' ? 'selected' : '' }}>Rejected</option>
+            <option value="TAYANG" {{ request('status') === 'TAYANG' ? 'selected' : '' }}>Tayang</option>
         </select>
         <button type="submit" class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-white">
             Cari
@@ -71,6 +76,7 @@
                             $badge = match($req->status) {
                                 'APPROVED' => 'bg-green-900/30 text-green-300',
                                 'PENDING' => 'bg-yellow-900/30 text-yellow-300',
+                                'TAYANG' => 'bg-blue-900/30 text-blue-300',
                                 default => 'bg-red-900/30 text-[#F27C97]',
                             };
                         @endphp
@@ -86,6 +92,7 @@
                                 <option value="PENDING" {{ $req->status === 'PENDING' ? 'selected' : '' }}>Pending</option>
                                 <option value="APPROVED" {{ $req->status === 'APPROVED' ? 'selected' : '' }}>Approved</option>
                                 <option value="REJECTED" {{ $req->status === 'REJECTED' ? 'selected' : '' }}>Rejected</option>
+                                <option value="TAYANG" {{ $req->status === 'TAYANG' ? 'selected' : '' }}>Tayang</option>
                             </select>
                             <button type="submit" class="text-xs font-semibold text-[var(--gold-soft)] hover:text-[var(--gold)] whitespace-nowrap">
                                 Simpan

@@ -80,6 +80,7 @@
         .status-pending{ background: rgba(232,177,86,0.15); color: var(--gold-soft); border: 1px solid rgba(232,177,86,0.3); }
         .status-approved{ background: rgba(74,222,128,0.15); color: #4ADE80; border: 1px solid rgba(74,222,128,0.3); }
         .status-rejected{ background: rgba(194,53,90,0.15); color: #F27C97; border: 1px solid rgba(194,53,90,0.3); }
+        .status-tayang{ background: rgba(96,165,250,0.15); color: #60A5FA; border: 1px solid rgba(96,165,250,0.3); }
     </style>
 </head>
 <body class="min-h-screen pb-10">
@@ -205,6 +206,7 @@
         PENDING: { label: 'Menunggu', cls: 'status-pending' },
         APPROVED: { label: 'Disetujui', cls: 'status-approved' },
         REJECTED: { label: 'Ditolak', cls: 'status-rejected' },
+        TAYANG: { label: 'Tayang', cls: 'status-tayang' },
     };
 
     function formatDate(dateStr){

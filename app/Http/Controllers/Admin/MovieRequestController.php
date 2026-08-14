@@ -27,6 +27,7 @@ class MovieRequestController extends Controller
             'pending' => MovieRequest::where('status', 'PENDING')->count(),
             'approved' => MovieRequest::where('status', 'APPROVED')->count(),
             'rejected' => MovieRequest::where('status', 'REJECTED')->count(),
+            'tayang' => MovieRequest::where('status', 'TAYANG')->count(),
         ];
 
         return view('admin.movie-requests.index', compact('requests', 'recap'));
@@ -39,7 +40,7 @@ class MovieRequestController extends Controller
     public function updateStatus(Request $request, MovieRequest $movieRequest)
     {
         $data = $request->validate([
-            'status' => 'required|in:PENDING,APPROVED,REJECTED',
+            'status' => 'required|in:PENDING,APPROVED,REJECTED,TAYANG',
         ]);
 
         $previousStatus = $movieRequest->status;
@@ -71,6 +72,8 @@ class MovieRequestController extends Controller
                 . "Request film *{$movieRequest->movie_title}* kamu telah *disetujui* dan akan segera kami tambahkan ke katalog. Terima kasih sudah request!",
             'REJECTED' => "😔 Halo {$user->first_name},\n\n"
                 . "Mohon maaf, request film *{$movieRequest->movie_title}* kamu *belum bisa kami proses* saat ini. Kamu tetap bisa mengajukan request judul lain kapan saja.",
+            'TAYANG' => "🍿 Yeay, {$user->first_name}!\n\n"
+                . "Film *{$movieRequest->movie_title}* yang kamu request sekarang sudah *tayang* dan bisa langsung kamu tonton di aplikasi. Selamat menonton!",
             default => "ℹ️ Halo {$user->first_name},\n\n"
                 . "Status request film *{$movieRequest->movie_title}* kamu diperbarui menjadi *{$movieRequest->status}*.",
         };

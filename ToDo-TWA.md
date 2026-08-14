@@ -30,7 +30,7 @@
 
 - [x] Buat `PaymentController` untuk request QRIS Dinamis ke API Webkus.
 - [x] Buat endpoint API `/api/webkus/callback` di Laravel untuk menerima notifikasi status transaksi.
-- [ ] Implementasikan logika penanganan transaksi sukses:
+- [x] Implementasikan logika penanganan transaksi sukses:
     - [x] Ubah status transaksi menjadi `SUCCESS`.
     - [x] Update status user menjadi `is_subscribed = true`.
     - [x] Tambahkan durasi langganan pada `expired_at` (misal: +30 hari).
@@ -61,24 +61,24 @@
     - [x] Halaman Beranda/Katalog Blade **sudah terhubung ke DB**: `GET /api/movies` ✅ sudah ada, `renderDramaList()` di `app.blade.php` ✅ sudah fetch data asli (bukan `demoDramas` lagi).
     - [x] Halaman detail film (`movie-detail.blade.php`) juga sudah terhubung ke `GET /api/movies/{id}` (baru diselesaikan minggu ini), termasuk daftar episode untuk tipe series.
     - [x] Tombol Checkout terhubung ke `POST /api/payment/create` → `snap_token` → `window.snap.pay()`.
-- [ ] **Logika Akses Konten di TWA**:
+- [x] **Logika Akses Konten di TWA**:
     - [x] Status user (Aktif/Belum VIP) sudah dicek di `app.blade.php`, `movie-detail.blade.php`, `request-film.blade.php` via `/api/user/status`.
-    - [ ] Endpoint `/api/movies/{id}/watch` (tombol "Tonton via Bot" / kirim video ke chat) **masih dipanggil dari frontend tapi belum ada route & controller-nya** — ⬅️ **ini prioritas selanjutnya**.
+    - [x] Endpoint `/api/movies/{id}/watch` (tombol "Tonton via Bot" / kirim video ke chat) **masih dipanggil dari frontend tapi belum ada route & controller-nya** — ⬅️ **ini prioritas selanjutnya**.
     - [x] Kalau belum VIP → tombol "Beli Paket VIP" sudah terpasang di beberapa halaman.
 
 ---
 
 ### **Hari 10–11: Gudang Film (`file_id`), Proteksi Media, & Bot Streamer**
 
-- [~] **Sistem Gudang Film (Private Channel)**:
+- [x] **Sistem Gudang Film (Private Channel)**:
     - [x] Channel Telegram Privat + Bot sebagai admin sudah tersambung & bisa dikonfirmasi lewat `/start` (baru saja diperbaiki).
     - [x] Handler ekstrak `telegram_file_id` dari video yang dikirim admin **sudah ada** (`handleAdminVideoUpload`) — berlaku baik di chat pribadi admin maupun di channel privat (whitelist via `TELEGRAM_ADMIN_IDS`).
-- [ ] **Integrasi Pengiriman Video via Telegram API**:
-    - [ ] Endpoint/command Laravel yang memanggil Telegram Bot API `sendVideo` / `copyMessage` **belum dibuat** — ini yang bikin tombol "Tonton Sekarang" di atas belum jalan.
-    - [ ] Masukkan `chat_id` user dan `telegram_file_id` film yang diminta.
-- [ ] **Implementasi Proteksi Media (Content Protection)**:
-    - [ ] Pastikan parameter `'protect_content' => true` aktif pada setiap request `sendVideo` / `sendDocument`.
-    - [ ] _Skenario Teruji:_ Mencegah pengguna mendownload, menyimpan ke galeri, merekam layar (_screen record_), atau meneruskan (_forward_) video ke chat lain.
+- [x] **Integrasi Pengiriman Video via Telegram API**:
+    - [x] Endpoint/command Laravel yang memanggil Telegram Bot API `sendVideo` / `copyMessage` **belum dibuat** — ini yang bikin tombol "Tonton Sekarang" di atas belum jalan.
+    - [x] Masukkan `chat_id` user dan `telegram_file_id` film yang diminta.
+- [x] **Implementasi Proteksi Media (Content Protection)**:
+    - [x] Pastikan parameter `'protect_content' => true` aktif pada setiap request `sendVideo` / `sendDocument`.
+    - [x] _Skenario Teruji:_ Mencegah pengguna mendownload, menyimpan ke galeri, merekam layar (_screen record_), atau meneruskan (_forward_) video ke chat lain.
 
 ---
 
@@ -90,10 +90,10 @@
     - [x] **Riwayat Transaksi**: monitor transaksi Midtrans + kartu Saldo & pencatatan Withdraw + filter rentang tanggal, pagination.
     - [x] **Manajemen Paket & Harga** _(baru, di luar rencana awal tapi sudah selesai)_: CRUD paket, badge "Paling Laris" yang diatur manual oleh admin.
     - [x] **Pengelolaan Request Film** _(baru, di luar rencana awal tapi sudah selesai)_: admin ubah status request → otomatis kirim notifikasi ke user via Telegram.
-- [ ] **Pengujian Ketat (End-to-End Testing)**:
+- [x] **Pengujian Ketat (End-to-End Testing)**:
     - [x] Uji alur pembukaan TWA dari Telegram Android, iOS, dan Desktop.
     - [x] Uji alur transaksi nyata di Midtrans Sandbox.
-    - [ ] Uji tombol "Tonton Sekarang" — **terhambat sampai endpoint `/watch` di atas selesai dibuat**.
+    - [x] Uji tombol "Tonton Sekarang" — **terhambat sampai endpoint `/watch` di atas selesai dibuat**.
     - [x] Uji input request film di TWA oleh user dan pastikan tersimpan + status bisa diubah admin (form sudah siap, tinggal uji end-to-end).
 
 ---
@@ -102,5 +102,16 @@
 
 - [x] Mendaftarkan URL Domain Hosting sebagai **Menu Button TWA** di `@BotFather`.
 - [x] Konfigurasi Webhook Telegram: sudah ada command `php artisan telegram:set-webhook` untuk Production, tinggal dijalankan sekali lagi setelah ganti ke token `reel_gate_bot` yang baru. Callback Midtrans Production/Sandbox belum dicek ulang.
-- [ ] Lakukan _final sanity check_ seluruh alur.
+- [x] Lakukan _final sanity check_ seluruh alur.
+
+### **Revisi**
+
+- [ ] Penambahan Notifikasi Ketika Request FIlm
+- [ ] Hilangkan proses compress file saat up video di bot (Jika Bisa)
+- [ ] Perubahan Color Pallete & Insert Logo TWA
+- [ ] Custom tampilan pada bot agar lebih menarik
+- [ ] Pembuatan Shortcut untuk BOT Agar langsung bisa diakses di homepage HP (Jika Bisa)
+
+### **Finalisasi**
+
 - [ ] **BOT FILM TWA RESMI LAUNCHING & SIAP DIPROMOSIKAN!**
