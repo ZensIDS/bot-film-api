@@ -54,10 +54,13 @@
         }
         .marquee-content {
             display: inline-block;
-            animation: marquee 18s linear infinite;
+            /* Mulai dari posisi terlihat (0%) alih-alih dari luar layar (100%), supaya teks
+               langsung tampil & berjalan begitu halaman dibuka, bukan nunggu "masuk" dulu
+               dari sisi kanan. Durasi juga dipercepat sedikit (18s -> 14s) biar lebih hidup. */
+            animation: marquee 14s linear infinite;
         }
         @keyframes marquee {
-            0% { transform: translateX(100%); }
+            0% { transform: translateX(0%); }
             100% { transform: translateX(-100%); }
         }
 
@@ -259,15 +262,15 @@
             </div>
 
             <!-- 2. TAB PAKET LANGGANAN -->
-            <div id="tab-packages" class="tab-content hidden px-4 pt-6">
-                <div class="text-center mb-6">
-                    <h2 class="font-display text-2xl font-semibold mb-1">Pilih Paket Streaming</h2>
-                    <p class="text-xs text-[var(--text-muted)]">Akses tanpa batas ke seluruh koleksi drama eksklusif</p>
+            <div id="tab-packages" class="tab-content hidden px-4 pt-5">
+                <div class="mb-4">
+                    <h2 class="font-display text-lg font-semibold mb-0.5">Pilih Paket Streaming</h2>
+                    <p class="text-[11px] text-[var(--text-muted)]">Akses tanpa batas ke seluruh koleksi drama eksklusif</p>
                 </div>
 
-                <div class="space-y-4" id="packages-list">
-                    <div class="rounded-2xl skel" style="height: 190px"></div>
-                    <div class="rounded-2xl skel" style="height: 190px"></div>
+                <div class="space-y-3" id="packages-list">
+                    <div class="rounded-xl skel" style="height: 84px"></div>
+                    <div class="rounded-xl skel" style="height: 84px"></div>
                 </div>
             </div>
 
@@ -444,16 +447,13 @@
             const priceFormatted = `Rp ${Number(pkg.price).toLocaleString('id-ID')}`;
 
             return `
-                <div class="${isFeatured ? 'bg-[var(--surface-2)] border-2 border-[var(--gold)]' : 'bg-[var(--surface)] border border-[var(--hairline)]'} rounded-2xl p-5 relative overflow-hidden">
-                    ${isFeatured ? '<span class="absolute top-0 right-0 bg-[var(--gold)] text-black font-bold text-[9px] px-3 py-1 rounded-bl-xl uppercase tracking-wider">Paling Laris</span>' : ''}
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h3 class="font-display text-lg font-semibold ${isFeatured ? 'text-[var(--gold)]' : 'text-[var(--gold-soft)]'}">${pkg.name}</h3>
-                            <p class="text-xs text-[var(--text-muted)]">Akses VIP selama ${pkg.duration_days} Hari</p>
-                        </div>
-                        <span class="text-xl font-bold ${isFeatured ? 'text-[var(--gold)]' : 'text-white'}">${priceFormatted}</span>
+                <div class="${isFeatured ? 'bg-[var(--surface-2)] border border-[var(--gold)]' : 'bg-[var(--surface)] border border-[var(--hairline)]'} rounded-xl px-4 py-3 flex items-center justify-between gap-3 relative">
+                    ${isFeatured ? '<span class="absolute -top-2 right-3 bg-[var(--gold)] text-black font-bold text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider">Paling Laris</span>' : ''}
+                    <div class="min-w-0">
+                        <h3 class="text-sm font-semibold ${isFeatured ? 'text-[var(--gold)]' : 'text-[var(--text)]'} truncate">${pkg.name}</h3>
+                        <p class="text-[11px] text-[var(--text-muted)]">${pkg.duration_days} Hari • <span class="font-semibold text-[var(--text)]">${priceFormatted}</span></p>
                     </div>
-                    <button onclick="goToCheckout(${pkg.id})" class="btn-ticket w-full font-bold py-2.5 rounded-xl text-xs mt-4">Beli ${pkg.name}</button>
+                    <button onclick="goToCheckout(${pkg.id})" class="btn-ticket font-bold py-1.5 px-4 rounded-lg text-[11px] shrink-0">Beli</button>
                 </div>
             `;
         }).join('');
@@ -513,8 +513,8 @@
             fetchPackages();
 
             const requestedTab = new URLSearchParams(window.location.search).get('tab');
-            if (requestedTab === 'packages') {
-                switchTab('packages');
+            if (requestedTab === 'packages' || requestedTab === 'profile') {
+                switchTab(requestedTab);
             }
 
             if (result.is_subscribed) {

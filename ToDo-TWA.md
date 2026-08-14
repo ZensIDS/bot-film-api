@@ -110,8 +110,8 @@
 - [x] Hilangkan proses compress file saat up video di bot (Jika Bisa)
 - [x] Desain Dashboard yang informatif disertai dengan shortcut informasi penting dan grafik grafik
 - [x] Buat tampilan admin agar menjadi responsive di HP
-- [ ] Custom tampilan pada bot agar lebih menarik
-- [ ] Perubahan Color Pallete & Insert Logo TWA
+- [x] Custom tampilan pada bot agar lebih menarik
+- [~] Perubahan Color Pallete & Insert Logo TWA
 - [ ] Pembuatan Shortcut untuk BOT Agar langsung bisa diakses di homepage HP (Jika Bisa)
 
 ### **Finalisasi**
