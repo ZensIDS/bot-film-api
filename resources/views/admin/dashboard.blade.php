@@ -21,9 +21,9 @@
 <!-- ============ Shortcut Statistik ============ -->
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     <div class="stat-card">
-        <div class="stat-icon bg-[rgba(232,177,86,0.15)] mb-3">👤</div>
+        <div class="stat-icon bg-[rgba(58,148,255,0.15)] mb-3">👤</div>
         <p class="text-xs text-[var(--text-muted)] mb-1">Total User</p>
-        <p class="font-display text-2xl font-semibold text-white">{{ number_format($stats['total_users']) }}</p>
+        <p class="font-display text-2xl font-semibold text-[var(--text)]">{{ number_format($stats['total_users']) }}</p>
     </div>
     <div class="stat-card">
         <div class="stat-icon bg-[rgba(34,197,94,0.15)] mb-3">💎</div>
@@ -31,33 +31,33 @@
         <p class="font-display text-2xl font-semibold text-green-300">{{ number_format($stats['active_vip']) }}</p>
     </div>
     <div class="stat-card">
-        <div class="stat-icon bg-[rgba(232,177,86,0.15)] mb-3">💰</div>
+        <div class="stat-icon bg-[rgba(58,148,255,0.15)] mb-3">💰</div>
         <p class="text-xs text-[var(--text-muted)] mb-1">Revenue Bulan Ini</p>
         <p class="font-display text-xl font-semibold text-[var(--gold-soft)]">Rp{{ number_format($stats['revenue_this_month'], 0, ',', '.') }}</p>
     </div>
     <div class="stat-card">
-        <div class="stat-icon bg-[rgba(96,165,250,0.15)] mb-3">🏦</div>
+        <div class="stat-icon bg-[rgba(33,132,226,0.15)] mb-3">🏦</div>
         <p class="text-xs text-[var(--text-muted)] mb-1">Saldo (Revenue - Withdraw)</p>
         <p class="font-display text-xl font-semibold text-blue-300">Rp{{ number_format($stats['balance'], 0, ',', '.') }}</p>
     </div>
     <div class="stat-card">
-        <div class="stat-icon bg-[rgba(232,177,86,0.15)] mb-3">🎬</div>
+        <div class="stat-icon bg-[rgba(58,148,255,0.15)] mb-3">🎬</div>
         <p class="text-xs text-[var(--text-muted)] mb-1">Total Film</p>
-        <p class="font-display text-2xl font-semibold text-white">{{ number_format($stats['total_movies']) }}</p>
+        <p class="font-display text-2xl font-semibold text-[var(--text)]">{{ number_format($stats['total_movies']) }}</p>
         <p class="text-[10px] text-[var(--text-muted)] mt-0.5">{{ $stats['active_movies'] }} aktif</p>
     </div>
     <div class="stat-card">
         <div class="stat-icon bg-[rgba(194,53,90,0.15)] mb-3">📥</div>
         <p class="text-xs text-[var(--text-muted)] mb-1">Request Pending</p>
-        <p class="font-display text-2xl font-semibold text-[#F27C97]">{{ number_format($stats['pending_requests']) }}</p>
+        <p class="font-display text-2xl font-semibold text-[var(--crimson)]">{{ number_format($stats['pending_requests']) }}</p>
     </div>
     <div class="stat-card">
         <div class="stat-icon bg-[rgba(34,197,94,0.15)] mb-3">🧾</div>
         <p class="text-xs text-[var(--text-muted)] mb-1">Transaksi Sukses (Bulan Ini)</p>
-        <p class="font-display text-2xl font-semibold text-white">{{ number_format($stats['transactions_this_month']) }}</p>
+        <p class="font-display text-2xl font-semibold text-[var(--text)]">{{ number_format($stats['transactions_this_month']) }}</p>
     </div>
     <div class="stat-card">
-        <div class="stat-icon bg-[rgba(232,177,86,0.15)] mb-3">📊</div>
+        <div class="stat-icon bg-[rgba(58,148,255,0.15)] mb-3">📊</div>
         <p class="text-xs text-[var(--text-muted)] mb-1">Total Revenue (all-time)</p>
         <p class="font-display text-xl font-semibold text-[var(--gold-soft)]">Rp{{ number_format($stats['total_revenue'], 0, ',', '.') }}</p>
     </div>
@@ -66,23 +66,23 @@
 <!-- ============ Shortcut Menu Cepat ============ -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <a href="{{ route('admin.movies.create') }}" class="shortcut-card">
-        <div class="stat-icon bg-[rgba(232,177,86,0.15)]">➕</div>
+        <div class="stat-icon bg-[rgba(58,148,255,0.15)]">➕</div>
         <div>
-            <p class="text-sm font-semibold text-white">Tambah Film</p>
+            <p class="text-sm font-semibold text-[var(--text)]">Tambah Film</p>
             <p class="text-[11px] text-[var(--text-muted)]">Upload film/episode baru</p>
         </div>
     </a>
     <a href="{{ route('admin.movie-requests.index') }}" class="shortcut-card">
         <div class="stat-icon bg-[rgba(194,53,90,0.15)]">📥</div>
         <div>
-            <p class="text-sm font-semibold text-white">Review Request Film</p>
+            <p class="text-sm font-semibold text-[var(--text)]">Review Request Film</p>
             <p class="text-[11px] text-[var(--text-muted)]">{{ $stats['pending_requests'] }} menunggu direview</p>
         </div>
     </a>
     <a href="{{ route('admin.users.index') }}" class="shortcut-card">
-        <div class="stat-icon bg-[rgba(96,165,250,0.15)]">👤</div>
+        <div class="stat-icon bg-[rgba(33,132,226,0.15)]">👤</div>
         <div>
-            <p class="text-sm font-semibold text-white">Kelola User</p>
+            <p class="text-sm font-semibold text-[var(--text)]">Kelola User</p>
             <p class="text-[11px] text-[var(--text-muted)]">Extend / revoke VIP</p>
         </div>
     </a>
@@ -91,28 +91,28 @@
 <!-- ============ Grafik ============ -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
     <div class="chart-card lg:col-span-2">
-        <p class="text-sm font-semibold text-white mb-4">Revenue 14 Hari Terakhir</p>
+        <p class="text-sm font-semibold text-[var(--text)] mb-4">Revenue 14 Hari Terakhir</p>
         <canvas id="revenueChart" height="110"></canvas>
     </div>
     <div class="chart-card">
-        <p class="text-sm font-semibold text-white mb-4">Status Transaksi</p>
+        <p class="text-sm font-semibold text-[var(--text)] mb-4">Status Transaksi</p>
         <canvas id="statusChart" height="110"></canvas>
     </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
     <div class="chart-card lg:col-span-2">
-        <p class="text-sm font-semibold text-white mb-4">User Baru 14 Hari Terakhir</p>
+        <p class="text-sm font-semibold text-[var(--text)] mb-4">User Baru 14 Hari Terakhir</p>
         <canvas id="usersChart" height="110"></canvas>
     </div>
 
     <!-- ============ Aktivitas Terbaru ============ -->
     <div class="chart-card">
-        <p class="text-sm font-semibold text-white mb-3">Request Film Terbaru</p>
+        <p class="text-sm font-semibold text-[var(--text)] mb-3">Request Film Terbaru</p>
         @forelse ($recentRequests as $req)
             <div class="activity-row">
                 <div class="min-w-0">
-                    <p class="text-xs font-semibold text-white truncate">{{ $req->movie_title }}</p>
+                    <p class="text-xs font-semibold text-[var(--text)] truncate">{{ $req->movie_title }}</p>
                     <p class="text-[10px] text-[var(--text-muted)]">{{ $req->user->first_name ?? 'User' }} · {{ $req->created_at->diffForHumans() }}</p>
                 </div>
                 <span class="pill bg-yellow-900/30 text-yellow-300">Pending</span>
@@ -125,7 +125,7 @@
 
 <!-- ============ Transaksi Terbaru ============ -->
 <div class="chart-card">
-    <p class="text-sm font-semibold text-white mb-3">Transaksi Terbaru</p>
+    <p class="text-sm font-semibold text-[var(--text)] mb-3">Transaksi Terbaru</p>
     <div class="overflow-x-auto -mx-1">
         <table class="w-full text-xs min-w-[560px]">
             <thead>
@@ -145,7 +145,7 @@
                             'SUCCESS' => 'bg-green-900/30 text-green-300',
                             'PENDING' => 'bg-yellow-900/30 text-yellow-300',
                             'EXPIRED' => 'bg-gray-700/40 text-gray-300',
-                            default => 'bg-red-900/30 text-[#F27C97]',
+                            default => 'bg-red-50 text-[var(--crimson)]',
                         };
                     @endphp
                     <tr class="border-b border-[var(--hairline)] last:border-none">
@@ -175,9 +175,9 @@
     const statusLabels = @json($charts['status_labels']);
     const statusSeries = @json($charts['status_series']);
 
-    const goldColor = '#E8B156';
-    const gridColor = 'rgba(232,177,86,0.08)';
-    const textMuted = '#9C93AF';
+    const goldColor = '#3A94FF';
+    const gridColor = 'rgba(31,78,127,0.10)';
+    const textMuted = '#5C7A99';
 
     Chart.defaults.color = textMuted;
     Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
@@ -191,7 +191,7 @@
                 label: 'Revenue',
                 data: revenueSeries,
                 borderColor: goldColor,
-                backgroundColor: 'rgba(232,177,86,0.12)',
+                backgroundColor: 'rgba(58,148,255,0.12)',
                 tension: 0.35,
                 fill: true,
                 pointRadius: 2,
@@ -214,7 +214,7 @@
             datasets: [{
                 label: 'User Baru',
                 data: usersSeries,
-                backgroundColor: 'rgba(96,165,250,0.55)',
+                backgroundColor: 'rgba(33,132,226,0.55)',
                 borderRadius: 6,
                 maxBarThickness: 24,
             }]
@@ -236,7 +236,7 @@
             datasets: [{
                 data: statusSeries,
                 backgroundColor: ['#22C55E', '#EAB308', '#C2355A', '#6B7280'],
-                borderColor: '#16131F',
+                borderColor: '#FFFFFF',
                 borderWidth: 2,
             }]
         },

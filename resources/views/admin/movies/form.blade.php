@@ -6,7 +6,7 @@
 @section('content')
 
 <div class="flex items-center gap-2 mb-5">
-    <a href="{{ route('admin.movies.index') }}" class="text-xs font-semibold text-[var(--text-muted)] hover:text-white">
+    <a href="{{ route('admin.movies.index') }}" class="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--gold)]">
         &larr; Kembali ke daftar film
     </a>
 </div>
@@ -20,8 +20,8 @@
         <div>
             <label class="block text-xs font-semibold text-[var(--text-muted)] mb-1.5">Judul Film</label>
             <input type="text" name="title" value="{{ old('title', $movie->title) }}" required
-                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[var(--gold)]">
-            @error('title') <p class="text-xs text-[#F27C97] mt-1">{{ $message }}</p> @enderror
+                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-4 py-2.5 text-sm text-[var(--text)] focus:outline-none focus:border-[var(--gold)]">
+            @error('title') <p class="text-xs text-[var(--crimson)] mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -29,14 +29,14 @@
                 <label class="block text-xs font-semibold text-[var(--text-muted)] mb-1.5">Genre</label>
                 <input type="text" name="genre" list="genre_list" value="{{ old('genre', $movie->genre) }}"
                     placeholder="Pilih genre yang ada atau ketik baru"
-                    class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[var(--gold)]">
+                    class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-4 py-2.5 text-sm text-[var(--text)] focus:outline-none focus:border-[var(--gold)]">
                 <datalist id="genre_list">
                     @foreach ($genres as $g)
                         <option value="{{ $g }}">
                     @endforeach
                 </datalist>
                 <p class="text-[11px] text-[var(--text-muted)] mt-1">Ketik untuk cari genre yang sudah ada, atau langsung ketik nama genre baru.</p>
-                @error('genre') <p class="text-xs text-[#F27C97] mt-1">{{ $message }}</p> @enderror
+                @error('genre') <p class="text-xs text-[var(--crimson)] mt-1">{{ $message }}</p> @enderror
             </div>
             <div>
                 <label class="block text-xs font-semibold text-[var(--text-muted)] mb-1.5">Cover</label>
@@ -51,7 +51,7 @@
                     <div class="flex-1">
                         <input type="file" name="cover" accept="image/png,image/jpeg,image/webp"
                             onchange="previewCover(this)"
-                            class="w-full text-xs text-[var(--text-muted)] file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[var(--surface-2)] file:text-white">
+                            class="w-full text-xs text-[var(--text-muted)] file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[var(--surface-2)] file:text-[var(--text)]">
 
                         @if ($isEdit && $movie->cover_path)
                             <label class="flex items-center gap-1.5 mt-1.5 text-[11px] text-[var(--text-muted)]">
@@ -62,14 +62,14 @@
                     </div>
                 </div>
                 <p class="text-[11px] text-[var(--text-muted)] mt-1">JPG/PNG/WEBP, maks 2MB.</p>
-                @error('cover') <p class="text-xs text-[#F27C97] mt-1">{{ $message }}</p> @enderror
+                @error('cover') <p class="text-xs text-[var(--crimson)] mt-1">{{ $message }}</p> @enderror
             </div>
         </div>
 
         <div>
             <label class="block text-xs font-semibold text-[var(--text-muted)] mb-1.5">Deskripsi</label>
             <textarea name="description" rows="3"
-                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[var(--gold)]">{{ old('description', $movie->description) }}</textarea>
+                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-4 py-2.5 text-sm text-[var(--text)] focus:outline-none focus:border-[var(--gold)]">{{ old('description', $movie->description) }}</textarea>
         </div>
 
         <div>
@@ -94,7 +94,7 @@
                     </div>
                 </label>
             </div>
-            @error('type') <p class="text-xs text-[#F27C97] mt-1">{{ $message }}</p> @enderror
+            @error('type') <p class="text-xs text-[var(--crimson)] mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div id="single_file_field">
@@ -103,11 +103,11 @@
             </label>
             <input type="text" name="telegram_file_id" value="{{ old('telegram_file_id', $movie->telegram_file_id) }}"
                 placeholder="Tempel file_id dari log webhook bot"
-                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-4 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-[var(--gold)]">
+                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-4 py-2.5 text-sm text-[var(--text)] font-mono focus:outline-none focus:border-[var(--gold)]">
             <p class="text-[11px] text-[var(--text-muted)] mt-1">
                 Dapatkan dari admin upload video ke channel privat, lalu ambil <code>file_id</code>-nya dari bot.
             </p>
-            @error('telegram_file_id') <p class="text-xs text-[#F27C97] mt-1">{{ $message }}</p> @enderror
+            @error('telegram_file_id') <p class="text-xs text-[var(--crimson)] mt-1">{{ $message }}</p> @enderror
         </div>
 
         <div class="flex items-center gap-2.5">
@@ -128,7 +128,7 @@
 
 @if ($isEdit && $movie->type === 'series')
 <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl p-6 mt-6">
-    <h3 class="font-display text-base font-semibold text-white mb-1">Daftar Episode</h3>
+    <h3 class="font-display text-base font-semibold text-[var(--text)] mb-1">Daftar Episode</h3>
     <p class="text-xs text-[var(--text-muted)] mb-4">Tambahkan episode satu per satu. Tombol "Tonton" di TWA akan mengirim file_id episode yang dipilih user.</p>
 
     <div class="space-y-2 mb-6">
@@ -146,7 +146,7 @@
                 <form action="{{ route('admin.movies.episodes.destroy', [$movie, $episode]) }}" method="POST" onsubmit="return confirm('Hapus episode {{ $episode->episode_number }}?');" class="shrink-0">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="text-xs font-semibold text-[var(--crimson)] hover:text-[#F27C97]">Hapus</button>
+                    <button type="submit" class="text-xs font-semibold text-[var(--crimson)] hover:text-[var(--crimson)]">Hapus</button>
                 </form>
             </div>
 
@@ -157,17 +157,17 @@
                     <div>
                         <label class="block text-[11px] text-[var(--text-muted)] mb-1">No. Episode</label>
                         <input type="number" min="1" name="episode_number" value="{{ $episode->episode_number }}" required
-                            class="w-full bg-[var(--bg)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-white">
+                            class="w-full bg-[var(--bg)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-[var(--text)]">
                     </div>
                     <div class="md:col-span-1">
                         <label class="block text-[11px] text-[var(--text-muted)] mb-1">Judul (opsional)</label>
                         <input type="text" name="title" value="{{ $episode->title }}"
-                            class="w-full bg-[var(--bg)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-white">
+                            class="w-full bg-[var(--bg)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-[var(--text)]">
                     </div>
                     <div class="md:col-span-1">
                         <label class="block text-[11px] text-[var(--text-muted)] mb-1">Telegram File ID</label>
                         <input type="text" name="telegram_file_id" value="{{ $episode->telegram_file_id }}" required
-                            class="w-full bg-[var(--bg)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-white font-mono">
+                            class="w-full bg-[var(--bg)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-[var(--text)] font-mono">
                     </div>
                     <button type="submit" class="btn-gold text-xs font-bold px-4 py-2 rounded-lg h-fit">Simpan</button>
                 </form>
@@ -182,21 +182,21 @@
         <div>
             <label class="block text-[11px] text-[var(--text-muted)] mb-1">No. Episode</label>
             <input type="number" min="1" name="episode_number" value="{{ old('episode_number', $movie->episodes->max('episode_number') + 1) }}" required
-                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-white">
+                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-[var(--text)]">
         </div>
         <div>
             <label class="block text-[11px] text-[var(--text-muted)] mb-1">Judul (opsional)</label>
             <input type="text" name="title" placeholder="mis. Awal Pertemuan"
-                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-white">
+                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-[var(--text)]">
         </div>
         <div>
             <label class="block text-[11px] text-[var(--text-muted)] mb-1">Telegram File ID</label>
             <input type="text" name="telegram_file_id" required placeholder="Tempel file_id"
-                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-white font-mono">
+                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-lg px-3 py-2 text-sm text-[var(--text)] font-mono">
         </div>
         <button type="submit" class="btn-gold text-xs font-bold px-4 py-2.5 rounded-lg h-fit">+ Tambah Episode</button>
     </form>
-    @error('episode_number') <p class="text-xs text-[#F27C97] mt-2">{{ $message }}</p> @enderror
+    @error('episode_number') <p class="text-xs text-[var(--crimson)] mt-2">{{ $message }}</p> @enderror
 </div>
 @elseif (!$isEdit)
 <div class="mt-6 text-xs text-[var(--text-muted)] px-1">

@@ -111,6 +111,7 @@
 - [x] Desain Dashboard yang informatif disertai dengan shortcut informasi penting dan grafik grafik
 - [x] Buat tampilan admin agar menjadi responsive di HP
 - [x] Custom tampilan pada bot agar lebih menarik
+- [ ] Migrasi Bot -> @reelgatebot
 - [~] Perubahan Color Pallete & Insert Logo TWA
 
 ### **Finalisasi**

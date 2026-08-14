@@ -8,7 +8,7 @@
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
     <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl p-5">
         <p class="text-xs text-[var(--text-muted)] mb-1">Total User Terdaftar</p>
-        <p class="font-display text-2xl font-semibold text-white">{{ number_format($recap['total'], 0, ',', '.') }}</p>
+        <p class="font-display text-2xl font-semibold text-[var(--text)]">{{ number_format($recap['total'], 0, ',', '.') }}</p>
     </div>
     <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl p-5">
         <p class="text-xs text-[var(--text-muted)] mb-1">VIP Aktif</p>
@@ -16,7 +16,7 @@
     </div>
     <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl p-5">
         <p class="text-xs text-[var(--text-muted)] mb-1">Belum/Kadaluarsa</p>
-        <p class="font-display text-2xl font-semibold text-white">{{ number_format($recap['expired'], 0, ',', '.') }}</p>
+        <p class="font-display text-2xl font-semibold text-[var(--text)]">{{ number_format($recap['expired'], 0, ',', '.') }}</p>
     </div>
 </div>
 
@@ -27,15 +27,15 @@
             name="q"
             value="{{ request('q') }}"
             placeholder="Cari nama, username, atau telegram ID..."
-            class="bg-[var(--surface)] border border-[var(--hairline)] rounded-xl px-4 py-2 text-sm text-white placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--gold)] w-72"
+            class="bg-[var(--surface)] border border-[var(--hairline)] rounded-xl px-4 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--gold)] w-72"
         >
         <select name="status" onchange="this.form.submit()"
-            class="bg-[var(--surface)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--gold)]">
+            class="bg-[var(--surface)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:border-[var(--gold)]">
             <option value="">Semua Status</option>
             <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>VIP Aktif</option>
             <option value="expired" {{ request('status') === 'expired' ? 'selected' : '' }}>Belum/Kadaluarsa</option>
         </select>
-        <button type="submit" class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-white">
+        <button type="submit" class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-[var(--gold)]">
             Cari
         </button>
     </form>
@@ -64,7 +64,7 @@
                                 {{ strtoupper(substr($user->first_name ?: 'U', 0, 1)) }}
                             </div>
                             <div class="min-w-0">
-                                <p class="font-semibold text-white truncate">{{ $user->first_name ?: '(tanpa nama)' }}</p>
+                                <p class="font-semibold text-[var(--text)] truncate">{{ $user->first_name ?: '(tanpa nama)' }}</p>
                                 <p class="text-[11px] text-[var(--text-muted)] truncate">{{ $user->username ? '@' . $user->username : '—' }}</p>
                             </div>
                         </div>
@@ -90,7 +90,7 @@
                             @if ($isActive)
                                 <button type="button"
                                     onclick="openRevokeModal('{{ route('admin.users.revoke-vip', $user) }}', {{ Illuminate\Support\Js::from($user->first_name ?: $user->telegram_id) }})"
-                                    class="text-xs font-semibold text-[var(--crimson)] hover:text-[#F27C97] whitespace-nowrap">
+                                    class="text-xs font-semibold text-[var(--crimson)] hover:text-[var(--crimson)] whitespace-nowrap">
                                     Cabut
                                 </button>
                             @endif
@@ -115,7 +115,7 @@
 <!-- ===================== Modal: Extend VIP ===================== -->
 <div id="extendModalBackdrop" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl w-full max-w-sm p-6 shadow-2xl">
-        <h3 class="font-display text-lg font-semibold text-white mb-1">Perpanjang VIP</h3>
+        <h3 class="font-display text-lg font-semibold text-[var(--text)] mb-1">Perpanjang VIP</h3>
         <p id="extendModalUserName" class="text-sm text-[var(--text-muted)] mb-5">—</p>
 
         <form id="extendForm" method="POST" action="">
@@ -130,13 +130,13 @@
                     max="100000"
                     value="30"
                     required
-                    class="w-24 bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-white text-center focus:outline-none focus:border-[var(--gold)]"
+                    class="w-24 bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-[var(--text)] text-center focus:outline-none focus:border-[var(--gold)]"
                 >
                 <select
                     name="unit"
                     id="extendUnit"
                     required
-                    class="flex-1 bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--gold)]"
+                    class="flex-1 bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:border-[var(--gold)]"
                 >
                     <option value="minutes">Menit</option>
                     <option value="hours">Jam</option>
@@ -149,7 +149,7 @@
 
             <div class="flex items-center justify-end gap-3">
                 <button type="button" onclick="closeExtendModal()"
-                    class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-white">
+                    class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-[var(--gold)]">
                     Batal
                 </button>
                 <button type="submit"
@@ -164,12 +164,12 @@
 <!-- ===================== Modal: Confirm Cabut VIP ===================== -->
 <div id="revokeModalBackdrop" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl w-full max-w-sm p-6 shadow-2xl">
-        <div class="w-11 h-11 rounded-full bg-red-900/30 flex items-center justify-center text-xl mb-4">
+        <div class="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center text-xl mb-4">
             ⚠️
         </div>
-        <h3 class="font-display text-lg font-semibold text-white mb-1">Cabut Status VIP?</h3>
+        <h3 class="font-display text-lg font-semibold text-[var(--text)] mb-1">Cabut Status VIP?</h3>
         <p class="text-sm text-[var(--text-muted)] mb-6">
-            Anda akan mencabut status VIP dari <span id="revokeModalUserName" class="text-white font-semibold">—</span>.
+            Anda akan mencabut status VIP dari <span id="revokeModalUserName" class="text-[var(--text)] font-semibold">—</span>.
             Aksi ini langsung aktif dan akses premium user akan dihentikan saat itu juga.
         </p>
 
@@ -177,7 +177,7 @@
             @csrf
             <div class="flex items-center justify-end gap-3">
                 <button type="button" onclick="closeRevokeModal()"
-                    class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-white">
+                    class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-[var(--gold)]">
                     Batal
                 </button>
                 <button type="submit"

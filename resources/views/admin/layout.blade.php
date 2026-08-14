@@ -12,18 +12,18 @@
 
     <style>
         :root{
-            --bg: #0B0910; --surface: #16131F; --surface-2: #1E1930;
-            --gold: #E8B156; --gold-soft: #F3D08A; --crimson: #C2355A;
-            --text: #EDE9F5; --text-muted: #9C93AF; --hairline: rgba(232,177,86,0.16);
+            --bg: #FFFFFF; --surface: #EFF5FC; --surface-2: #DCEAFC;
+            --gold: #3A94FF; --gold-soft: #2184E2; --crimson: #C2355A;
+            --text: #2D3647; --text-muted: #5C7A99; --hairline: rgba(31,78,127,0.15);
         }
         body{ background-color: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-display{ font-family: 'Fraunces', serif; }
 
         .sidebar-link{ display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:10px; color: var(--text-muted); font-size: 13px; font-weight: 600; transition: all .15s; }
         .sidebar-link:hover{ background: var(--surface-2); color: var(--text); }
-        .sidebar-link.active{ background: linear-gradient(90deg, rgba(232,177,86,0.16), transparent); color: var(--gold-soft); border-left: 3px solid var(--gold); padding-left: 11px; }
+        .sidebar-link.active{ background: linear-gradient(90deg, rgba(58,148,255,0.16), transparent); color: var(--gold-soft); border-left: 3px solid var(--gold); padding-left: 11px; }
 
-        .btn-gold{ background: linear-gradient(180deg, var(--gold-soft), var(--gold)); color: #241705; }
+        .btn-gold{ background: linear-gradient(180deg, var(--gold-soft), var(--gold)); color: #EAF2FF; }
         .btn-gold:hover{ filter: brightness(1.05); }
 
         ::-webkit-scrollbar{ width: 8px; height: 8px; }
@@ -80,7 +80,7 @@
             body.sidebar-collapsed .sidebar-link.active{
                 border-left: none;
                 padding: 10px;
-                border: 1px solid rgba(232,177,86,0.35);
+                border: 1px solid rgba(58,148,255,0.35);
             }
             body.sidebar-collapsed #sidebar-brand-row{
                 display: none;
@@ -144,7 +144,7 @@
         <div class="px-5 py-5 border-b border-[var(--hairline)] flex items-center justify-between">
             <div id="sidebar-brand-row" class="flex items-center gap-2 min-w-0">
                 <div class="min-w-0">
-                    <h1 class="font-display text-lg font-semibold text-white whitespace-nowrap">
+                    <h1 class="font-display text-lg font-semibold text-[var(--text)] whitespace-nowrap">
                         REEL<span style="color:var(--gold)">GATE</span>
                     </h1>
                     <p class="sidebar-brand-sub text-[10px] text-[var(--text-muted)] uppercase tracking-wide mt-0.5">Admin Panel</p>
@@ -189,7 +189,7 @@
                     {{ strtoupper(substr(Auth::guard('admin')->user()->name, 0, 1)) }}
                 </div>
                 <div class="min-w-0 sidebar-label">
-                    <p class="text-xs font-semibold text-white truncate">{{ Auth::guard('admin')->user()->name }}</p>
+                    <p class="text-xs font-semibold text-[var(--text)] truncate">{{ Auth::guard('admin')->user()->name }}</p>
                 </div>
             </div>
             <form action="{{ route('admin.logout') }}" method="POST">
@@ -207,7 +207,7 @@
             <div class="flex items-center gap-3">
                 <button type="button" class="text-[var(--text)] text-xl leading-none px-1"
                     onclick="document.body.classList.add('sidebar-open')" aria-label="Buka menu">☰</button>
-                <h1 class="font-display text-base font-semibold text-white">REEL<span style="color:var(--gold)">GATE</span></h1>
+                <h1 class="font-display text-base font-semibold text-[var(--text)]">REEL<span style="color:var(--gold)">GATE</span></h1>
             </div>
             <form action="{{ route('admin.logout') }}" method="POST">
                 @csrf
@@ -216,7 +216,7 @@
         </header>
 
         <main class="p-6 max-w-6xl mx-auto">
-            <h2 class="font-display text-xl font-semibold text-white mb-5">@yield('page_title', 'Dashboard')</h2>
+            <h2 class="font-display text-xl font-semibold text-[var(--text)] mb-5">@yield('page_title', 'Dashboard')</h2>
 
             @if (session('success'))
                 <div class="mb-5 rounded-xl px-4 py-3 text-sm bg-green-900/20 border border-green-700 text-green-300">
@@ -224,7 +224,7 @@
                 </div>
             @endif
             @if (session('error'))
-                <div class="mb-5 rounded-xl px-4 py-3 text-sm bg-red-900/20 border border-[var(--crimson)] text-[#F27C97]">
+                <div class="mb-5 rounded-xl px-4 py-3 text-sm bg-red-50 border border-[var(--crimson)] text-[var(--crimson)]">
                     {{ session('error') }}
                 </div>
             @endif

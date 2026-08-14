@@ -13,9 +13,9 @@
 
     <style>
         :root{
-            --bg: #0B0910; --surface: #16131F; --surface-2: #1E1930;
-            --gold: #E8B156; --gold-soft: #F3D08A; --crimson: #C2355A;
-            --text: #EDE9F5; --text-muted: #9C93AF; --hairline: rgba(232,177,86,0.16);
+            --bg: #FFFFFF; --surface: #EFF5FC; --surface-2: #DCEAFC;
+            --gold: #3A94FF; --gold-soft: #2184E2; --crimson: #C2355A;
+            --text: #2D3647; --text-muted: #5C7A99; --hairline: rgba(31,78,127,0.15);
         }
         html, body { max-width: 100vw; overflow-x: hidden !important; }
         body{
@@ -28,7 +28,7 @@
         .btn-ticket{
             position: relative;
             background: linear-gradient(180deg, var(--gold-soft), var(--gold));
-            color: #241705;
+            color: #EAF2FF;
         }
         .btn-ticket::before, .btn-ticket::after{
             content:"";
@@ -77,10 +77,10 @@
             border-radius: 999px;
             white-space: nowrap;
         }
-        .status-pending{ background: rgba(232,177,86,0.15); color: var(--gold-soft); border: 1px solid rgba(232,177,86,0.3); }
+        .status-pending{ background: rgba(58,148,255,0.15); color: var(--gold-soft); border: 1px solid rgba(58,148,255,0.3); }
         .status-approved{ background: rgba(74,222,128,0.15); color: #4ADE80; border: 1px solid rgba(74,222,128,0.3); }
-        .status-rejected{ background: rgba(194,53,90,0.15); color: #F27C97; border: 1px solid rgba(194,53,90,0.3); }
-        .status-tayang{ background: rgba(96,165,250,0.15); color: #60A5FA; border: 1px solid rgba(96,165,250,0.3); }
+        .status-rejected{ background: rgba(194,53,90,0.15); color: var(--crimson); border: 1px solid rgba(194,53,90,0.3); }
+        .status-tayang{ background: rgba(33,132,226,0.15); color: #60A5FA; border: 1px solid rgba(33,132,226,0.3); }
 
         /* --- Nav Footer Styling (sama seperti /app) --- */
         .nav-tab.active { color: var(--gold); }
@@ -95,7 +95,7 @@
             <button onclick="window.location.href='/app'" class="w-8 h-8 rounded-full bg-[var(--surface)] border border-[var(--hairline)] flex items-center justify-center text-sm shrink-0">
                 ←
             </button>
-            <h1 class="text-base font-bold text-white">Request Film</h1>
+            <h1 class="text-base font-bold text-[var(--text)]">Request Film</h1>
         </div>
 
         <!-- Loading State -->
@@ -128,10 +128,10 @@
             </p>
 
             <!-- Notice: khusus pelanggan -->
-            <div id="locked-notice" class="hidden rounded-xl p-4 mb-5 text-center bg-gradient-to-r from-red-900/30 to-purple-900/30 border border-[var(--crimson)]">
+            <div id="locked-notice" class="hidden rounded-xl p-4 mb-5 text-center bg-gradient-to-r from-red-50 to-purple-50 border border-[var(--crimson)]">
                 <p class="text-xs text-[var(--gold-soft)] font-semibold mb-1">🔒 Fitur Khusus VIP</p>
                 <p class="text-[11px] text-[var(--text-muted)] mb-3">Request judul film hanya tersedia untuk pelanggan aktif. Berlangganan sekarang untuk mengakses fitur ini.</p>
-                <button onclick="window.location.href='/app?tab=packages'" class="text-xs bg-[var(--gold)] text-black font-bold px-4 py-1.5 rounded-lg">Beli Paket VIP</button>
+                <button onclick="window.location.href='/app?tab=packages'" class="text-xs bg-[var(--gold)] text-white font-bold px-4 py-1.5 rounded-lg">Beli Paket VIP</button>
             </div>
 
             <!-- Form Request -->

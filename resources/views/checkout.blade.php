@@ -16,9 +16,9 @@
 
     <style>
         :root{
-            --bg: #0B0910; --surface: #16131F; --surface-2: #1E1930;
-            --gold: #E8B156; --gold-soft: #F3D08A; --crimson: #C2355A;
-            --text: #EDE9F5; --text-muted: #9C93AF; --hairline: rgba(232,177,86,0.16);
+            --bg: #FFFFFF; --surface: #EFF5FC; --surface-2: #DCEAFC;
+            --gold: #3A94FF; --gold-soft: #2184E2; --crimson: #C2355A;
+            --text: #2D3647; --text-muted: #5C7A99; --hairline: rgba(31,78,127,0.15);
         }
         body { background-color: var(--bg); color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; }
         .font-display{ font-family: 'Fraunces', serif; }
@@ -38,7 +38,7 @@
             <button onclick="window.location.href='/app'" class="w-8 h-8 rounded-full bg-[var(--surface)] border border-[var(--hairline)] flex items-center justify-center text-sm">
                 ←
             </button>
-            <h1 class="text-base font-bold text-white">Rincian Pembayaran</h1>
+            <h1 class="text-base font-bold text-[var(--text)]">Rincian Pembayaran</h1>
         </div>
 
         <!-- State: memuat data paket -->
@@ -74,7 +74,7 @@
                 <div class="space-y-2 text-xs">
                     <div class="flex justify-between">
                         <span class="text-[var(--text-muted)]">Harga Paket</span>
-                        <span id="plan-price" class="font-semibold text-white">-</span>
+                        <span id="plan-price" class="font-semibold text-[var(--text)]">-</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-[var(--text-muted)]">Biaya Layanan</span>
@@ -83,7 +83,7 @@
                 </div>
 
                 <div class="border-t border-[var(--hairline)] pt-3 flex justify-between items-center">
-                    <span class="text-xs font-bold text-white">Total Bayar</span>
+                    <span class="text-xs font-bold text-[var(--text)]">Total Bayar</span>
                     <span id="plan-total" class="text-xl font-extrabold text-[var(--gold)]">-</span>
                 </div>
             </div>
@@ -91,7 +91,7 @@
             <!-- Informasi Akun Pembeli -->
             <div class="bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl p-4 text-xs space-y-1 mb-4">
                 <p class="text-[var(--text-muted)]">Akun Telegram:</p>
-                <p id="user-info" class="font-bold text-white">Memuat data pengguna...</p>
+                <p id="user-info" class="font-bold text-[var(--text)]">Memuat data pengguna...</p>
             </div>
 
             <p id="checkout-error" class="hidden text-xs text-[var(--crimson)] text-center mb-2"></p>
@@ -101,7 +101,7 @@
     <!-- Tombol Aksi Pembayaran Midtrans -->
     <div id="pay-action" class="hidden pt-6">
         <button id="pay-button" onclick="payWithMidtrans()"
-            class="w-full bg-gradient-to-r from-[var(--gold-soft)] to-[var(--gold)] text-black font-extrabold py-3.5 rounded-xl text-sm shadow-lg active:scale-95 transition disabled:opacity-60">
+            class="w-full bg-gradient-to-r from-[var(--gold-soft)] to-[var(--gold)] text-white font-extrabold py-3.5 rounded-xl text-sm shadow-lg active:scale-95 transition disabled:opacity-60">
             Lanjut ke Pembayaran Midtrans
         </button>
         <p class="text-center text-[10px] text-[var(--text-muted)] mt-3">Pembayaran diproses aman oleh Midtrans, langsung di dalam aplikasi ini.</p>

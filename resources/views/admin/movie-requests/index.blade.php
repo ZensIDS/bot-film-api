@@ -16,7 +16,7 @@
     </div>
     <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl p-5">
         <p class="text-xs text-[var(--text-muted)] mb-1">Ditolak</p>
-        <p class="font-display text-2xl font-semibold text-[#F27C97]">{{ $recap['rejected'] }}</p>
+        <p class="font-display text-2xl font-semibold text-[var(--crimson)]">{{ $recap['rejected'] }}</p>
     </div>
     <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl p-5">
         <p class="text-xs text-[var(--text-muted)] mb-1">Tayang</p>
@@ -31,17 +31,17 @@
             name="q"
             value="{{ request('q') }}"
             placeholder="Cari judul film..."
-            class="bg-[var(--surface)] border border-[var(--hairline)] rounded-xl px-4 py-2 text-sm text-white placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--gold)] w-64"
+            class="bg-[var(--surface)] border border-[var(--hairline)] rounded-xl px-4 py-2 text-sm text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--gold)] w-64"
         >
         <select name="status" onchange="this.form.submit()"
-            class="bg-[var(--surface)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--gold)]">
+            class="bg-[var(--surface)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:border-[var(--gold)]">
             <option value="">Semua Status</option>
             <option value="PENDING" {{ request('status') === 'PENDING' ? 'selected' : '' }}>Pending</option>
             <option value="APPROVED" {{ request('status') === 'APPROVED' ? 'selected' : '' }}>Approved</option>
             <option value="REJECTED" {{ request('status') === 'REJECTED' ? 'selected' : '' }}>Rejected</option>
             <option value="TAYANG" {{ request('status') === 'TAYANG' ? 'selected' : '' }}>Tayang</option>
         </select>
-        <button type="submit" class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-white">
+        <button type="submit" class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-[var(--gold)]">
             Cari
         </button>
     </form>
@@ -63,7 +63,7 @@
             @forelse ($requests as $req)
                 <tr class="border-b border-[var(--hairline)] last:border-0 hover:bg-[var(--surface-2)]/40">
                     <td class="px-5 py-3">
-                        <p class="font-semibold text-white">{{ $req->movie_title }}</p>
+                        <p class="font-semibold text-[var(--text)]">{{ $req->movie_title }}</p>
                     </td>
                     <td class="px-5 py-3">
                         <p class="text-[var(--text)] truncate">{{ $req->user->first_name ?? '(user dihapus)' }}</p>
@@ -77,7 +77,7 @@
                                 'APPROVED' => 'bg-green-900/30 text-green-300',
                                 'PENDING' => 'bg-yellow-900/30 text-yellow-300',
                                 'TAYANG' => 'bg-blue-900/30 text-blue-300',
-                                default => 'bg-red-900/30 text-[#F27C97]',
+                                default => 'bg-red-50 text-[var(--crimson)]',
                             };
                         @endphp
                         <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full {{ $badge }}">{{ $req->status }}</span>
@@ -88,7 +88,7 @@
                             class="flex items-center justify-end gap-2">
                             @csrf
                             <select name="status"
-                                class="bg-[var(--surface-2)] border border-[var(--hairline)] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[var(--gold)]">
+                                class="bg-[var(--surface-2)] border border-[var(--hairline)] rounded-lg px-2 py-1.5 text-xs text-[var(--text)] focus:outline-none focus:border-[var(--gold)]">
                                 <option value="PENDING" {{ $req->status === 'PENDING' ? 'selected' : '' }}>Pending</option>
                                 <option value="APPROVED" {{ $req->status === 'APPROVED' ? 'selected' : '' }}>Approved</option>
                                 <option value="REJECTED" {{ $req->status === 'REJECTED' ? 'selected' : '' }}>Rejected</option>

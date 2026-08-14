@@ -13,9 +13,9 @@
 
     <style>
         :root{
-            --bg: #0B0910; --surface: #16131F; --surface-2: #1E1930;
-            --gold: #E8B156; --gold-soft: #F3D08A; --crimson: #C2355A;
-            --text: #EDE9F5; --text-muted: #9C93AF; --hairline: rgba(232,177,86,0.16);
+            --bg: #FFFFFF; --surface: #EFF5FC; --surface-2: #DCEAFC;
+            --gold: #3A94FF; --gold-soft: #2184E2; --crimson: #C2355A;
+            --text: #2D3647; --text-muted: #5C7A99; --hairline: rgba(31,78,127,0.15);
         }
         html, body { max-width: 100vw; overflow-x: hidden !important; }
         body{
@@ -27,14 +27,14 @@
 
         .badge-vip{
             position: relative; overflow: hidden;
-            background: linear-gradient(90deg, #8A5B18, var(--gold), #8A5B18);
-            color: #1A1408;
+            background: linear-gradient(90deg, #123A5C, var(--gold), #123A5C);
+            color: #EAF2FF;
         }
 
         .btn-ticket{
             position: relative;
             background: linear-gradient(180deg, var(--gold-soft), var(--gold));
-            color: #241705;
+            color: #EAF2FF;
         }
         .btn-ticket::before, .btn-ticket::after{
             content:"";
@@ -79,7 +79,7 @@
             <button onclick="window.location.href='/app'" class="w-8 h-8 rounded-full bg-[var(--surface)] border border-[var(--hairline)] flex items-center justify-center text-sm shrink-0">
                 ←
             </button>
-            <h1 class="text-base font-bold text-white">Detail Film</h1>
+            <h1 class="text-base font-bold text-[var(--text)]">Detail Film</h1>
         </div>
 
         <!-- Loading State -->
@@ -136,7 +136,7 @@
             </div>
 
             <!-- Notice: perlu berlangganan -->
-            <div id="watch-locked-notice" class="hidden rounded-xl p-3.5 mt-3 text-center bg-gradient-to-r from-red-900/30 to-purple-900/30 border border-[var(--crimson)]">
+            <div id="watch-locked-notice" class="hidden rounded-xl p-3.5 mt-3 text-center bg-gradient-to-r from-red-50 to-purple-50 border border-[var(--crimson)]">
                 <p class="text-xs text-[var(--gold-soft)] font-semibold mb-0.5">🔒 Konten Khusus VIP</p>
                 <p class="text-[11px] text-[var(--text-muted)]">Berlangganan untuk membuka akses menonton film ini.</p>
             </div>
@@ -233,7 +233,7 @@
             <button type="button" onclick="handleWatchClick(${ep.id})"
                 class="w-full flex items-center justify-between bg-[var(--surface)] border border-[var(--hairline)] rounded-xl px-4 py-3 text-left hover:border-[var(--gold)] transition">
                 <div class="min-w-0">
-                    <p class="text-sm font-semibold text-white">Episode ${ep.episode_number}</p>
+                    <p class="text-sm font-semibold text-[var(--text)]">Episode ${ep.episode_number}</p>
                     ${ep.title ? `<p class="text-[11px] text-[var(--text-muted)] truncate">${ep.title}</p>` : ''}
                 </div>
                 <span class="text-[10px] text-[var(--text-muted)]">▶</span>
