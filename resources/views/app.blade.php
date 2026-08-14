@@ -363,7 +363,9 @@
         openLink: () => {},
         showAlert: (msg) => alert(msg),
         addToHomeScreen: () => {},
-        isVersionAtLeast: () => false,
+        checkHomeScreenStatus: () => {},
+        onEvent: () => {},
+        platform: 'unknown',
         initDataUnsafe: {}
     };
     tg.ready();
@@ -381,10 +383,13 @@
     function setupAddToHomeScreen(){
         const btn = document.getElementById('btn-add-home');
 
-        // Method addToHomeScreen() cuma ada di Telegram versi client yang mendukung
-        // Bot API 8.0+. Kalau tidak didukung (client lama / dibuka lewat browser biasa),
-        // tombolnya tetap disembunyikan supaya tidak membingungkan user.
-        if (!tg.isVersionAtLeast || !tg.isVersionAtLeast('8.0')) {
+        // 'addToHomeScreen' cuma bekerja di client Telegram MOBILE (Android/iOS) — di
+        // Telegram Desktop/Web dia diam-diam tidak melakukan apa-apa (tidak error, tapi
+        // juga tidak ada dialog yang muncul, terlihat seperti tombol "tidak merespons").
+        // tg.platform mengembalikan 'android', 'ios', 'tdesktop', 'weba', 'webk', dst.
+        const isMobile = tg.platform === 'android' || tg.platform === 'ios';
+
+        if (typeof tg.addToHomeScreen !== 'function' || !isMobile) {
             return;
         }
 
@@ -414,7 +419,13 @@
     }
 
     function handleAddToHomeScreen(){
-        tg.addToHomeScreen();
+        try {
+            tg.addToHomeScreen();
+        } catch (err) {
+            // Kalau client sudah lolos pengecekan platform tapi tetap gagal (mis. versi
+            // Telegram terlalu lama), kasih tahu user daripada diam saja.
+            tg.showAlert('Fitur ini butuh Telegram versi terbaru. Coba update aplikasi Telegram-mu dulu ya.');
+        }
     }
 
     function renderDramaList(dramas){

@@ -11,10 +11,23 @@ use Illuminate\Support\Facades\Log;
 
 class TelegramController extends Controller
 {
-    // Label tombol "STATUS LANGGANAN" di reply keyboard bawah. Ditaruh jadi konstanta
-    // supaya label di sendPersistentMenu() dan pengecekan teksnya di handleWebhook()
-    // dijamin selalu sama persis (Telegram mengirim balik teks tombol apa adanya).
+    // Label tombol di reply keyboard bawah. Ditaruh jadi konstanta supaya label di
+    // sendPersistentMenu() dan pengecekan teksnya di handleWebhook() dijamin selalu
+    // sama persis (Telegram mengirim balik teks tombol apa adanya).
+    //
+    // PENTING: keempat tombol ini SEMUA dibuat tombol teks BIASA (bukan 'web_app'),
+    // bukan cuma STATUS LANGGANAN. Awalnya REELGATE/REQUEST FILM/LIHAT PAKET memakai
+    // field 'web_app' langsung di reply keyboard (ReplyKeyboardMarkup), tapi ini
+    // ternyata tidak konsisten dibuka sebagai Mini App di semua versi client Telegram —
+    // sebagian malah membukanya sebagai tab browser biasa (initDataUnsafe.user jadi
+    // kosong → halaman TWA salah kira dibuka di luar Telegram, muncul "Buka lewat
+    // Telegram"). Tombol inline keyboard ('web_app' di dalam pesan balasan bot) jauh
+    // lebih stabil dan sudah terbukti jalan (dipakai juga di /start & alur paket), jadi
+    // sekarang ketiga tombol ini pun dibalas lewat mekanisme yang sama.
+    private const BTN_HOME = '🎬 REELGATE';
     private const BTN_STATUS = '📊 STATUS LANGGANAN';
+    private const BTN_REQUEST = '🎥 REQUEST FILM';
+    private const BTN_PACKAGES = '📦 LIHAT PAKET';
 
     public function handleWebhook(Request $request)
     {
@@ -180,11 +193,11 @@ class TelegramController extends Controller
                         'inline_keyboard' => [
                             [
                                 ['text' => '🎬 REELGATE', 'web_app' => ['url' => $this->webAppUrl('/app')]],
-                                ['text' => '📊 STATUS LANGGANAN', 'callback_data' => 'check_status']
+                                ['text' => '📊 Status Langganan', 'callback_data' => 'check_status']
                             ],
                             [
-                                ['text' => '🎥 REQUEST FILM', 'web_app' => ['url' => $this->webAppUrl('/request-film')]],
-                                ['text' => '📦 PILIH PAKET', 'web_app' => ['url' => $this->webAppUrl('/app?tab=packages')]]
+                                ['text' => '🎥 Request Film', 'web_app' => ['url' => $this->webAppUrl('/request-film')]],
+                                ['text' => '📦 Lihat Paket', 'web_app' => ['url' => $this->webAppUrl('/app?tab=packages')]]
                             ]
                         ]
                     ];
@@ -198,8 +211,6 @@ class TelegramController extends Controller
                 }
 
                 // Command /status ATAU tombol "STATUS LANGGANAN" di reply keyboard bawah
-                // (tombol ini murni tombol teks biasa, bukan web_app, jadi begitu ditekan
-                // Telegram mengirimkannya sebagai pesan teks normal seperti command lain).
                 elseif ($text === '/status' || $text === self::BTN_STATUS) {
                     // Jejak audit: bandingkan chat_id & user_id di sini dengan log "Admin extend VIP"
                     // kalau ada laporan status tidak sinkron antara admin/TWA vs bot.
@@ -219,9 +230,29 @@ class TelegramController extends Controller
                     $this->sendMessage($chatId, $statusText);
                 }
 
-                // Command /paket atau /buy
+                // Command /paket atau /buy → tetap balas daftar paket lewat pesan bot
+                // (alur beli via tombol inline "buy_package_{id}" -> sendCheckoutLink()).
                 elseif ($text === '/paket' || $text === '/buy') {
                     $this->sendPackageList($chatId);
+                }
+
+                // Tombol "LIHAT PAKET" di reply keyboard bawah → beda dari /paket di atas,
+                // ini langsung balas 1 tombol inline web_app yang membuka TWA di tab paket
+                // (sesuai kebutuhan: LIHAT PAKET mengarah ke TWA, bukan daftar paket di chat).
+                elseif ($text === self::BTN_PACKAGES) {
+                    $this->sendWebAppButton($chatId, '📦 Berikut daftar paket langganan yang tersedia:', '📦 Lihat Paket', $this->webAppUrl('/app?tab=packages'));
+                }
+
+                // Tombol "REELGATE" di reply keyboard bawah → balas dengan 1 tombol inline
+                // web_app yang membuka home TWA.
+                elseif ($text === self::BTN_HOME) {
+                    $this->sendWebAppButton($chatId, '🍿 Buka REELGATE:', '🎬 Buka REELGATE', $this->webAppUrl('/app'));
+                }
+
+                // Tombol "REQUEST FILM" di reply keyboard bawah → balas dengan 1 tombol inline
+                // web_app yang membuka halaman request film di TWA.
+                elseif ($text === self::BTN_REQUEST) {
+                    $this->sendWebAppButton($chatId, '🎥 Request judul film yang ingin kamu tonton:', '🎥 Request Film', $this->webAppUrl('/request-film'));
                 }
 
                 // Command /menu buat munculin lagi reply keyboard bawah kalau ke-dismiss user.
@@ -326,15 +357,34 @@ class TelegramController extends Controller
     }
 
     /**
+     * Kirim pesan singkat + 1 tombol inline 'web_app'. Dipakai untuk semua tombol reply
+     * keyboard (REELGATE, REQUEST FILM, LIHAT PAKET) supaya Mini App dibuka lewat mekanisme
+     * yang sudah terbukti stabil di semua versi client Telegram — bukan lewat 'web_app'
+     * langsung di reply keyboard yang tidak konsisten (lihat catatan di konstanta BTN_*).
+     */
+    private function sendWebAppButton($chatId, string $text, string $buttonLabel, string $url): void
+    {
+        $keyboard = [
+            'inline_keyboard' => [
+                [
+                    ['text' => $buttonLabel, 'web_app' => ['url' => $url]]
+                ]
+            ]
+        ];
+
+        $this->sendMessageWithKeyboard($chatId, $text, $keyboard);
+    }
+
+    /**
      * Kirim reply keyboard (menu di bawah kolom ketik) berisi 4 menu utama:
      * REELGATE, STATUS LANGGANAN, REQUEST FILM, LIHAT PAKET.
      *
-     * PENTING soal tipe tombol di reply keyboard:
-     * - REELGATE, REQUEST FILM, LIHAT PAKET pakai 'web_app' → begitu ditekan, Telegram
-     *   LANGSUNG membuka TWA di URL terkait, TIDAK mengirim pesan teks apa pun ke bot.
-     * - STATUS LANGGANAN sengaja dibuat tombol teks BIASA (tanpa web_app/url), karena
-     *   fiturnya cukup dijawab lewat pesan bot (lihat pengecekan self::BTN_STATUS di
-     *   handleWebhook), bukan lewat halaman TWA.
+     * PENTING: SEMUA tombol di sini adalah tombol teks BIASA (tanpa 'web_app'/'url').
+     * Begitu ditekan, Telegram mengirimkannya sebagai pesan teks biasa ke bot (persis
+     * seperti user mengetik teksnya manual), lalu ditangkap di handleWebhook() dan
+     * dibalas dengan tombol inline 'web_app' (lihat sendWebAppButton()) untuk membuka
+     * TWA-nya. Ini sengaja tidak pakai field 'web_app' langsung di reply keyboard karena
+     * terbukti tidak konsisten dibuka sebagai Mini App di semua versi client Telegram.
      *
      * Keyboard ini persisten: sekali terkirim (reply_markup ResizeKeyboard), Telegram akan
      * terus menampilkannya di bawah kolom ketik user sampai bot mengirim ReplyKeyboardRemove
@@ -345,12 +395,12 @@ class TelegramController extends Controller
         $keyboard = [
             'keyboard' => [
                 [
-                    ['text' => '🎬 REELGATE', 'web_app' => ['url' => $this->webAppUrl('/app')]],
+                    ['text' => self::BTN_HOME],
                     ['text' => self::BTN_STATUS],
                 ],
                 [
-                    ['text' => '🎥 REQUEST FILM', 'web_app' => ['url' => $this->webAppUrl('/request-film')]],
-                    ['text' => '📦 PILIH PAKET', 'web_app' => ['url' => $this->webAppUrl('/app?tab=packages')]],
+                    ['text' => self::BTN_REQUEST],
+                    ['text' => self::BTN_PACKAGES],
                 ],
             ],
             'resize_keyboard' => true,
