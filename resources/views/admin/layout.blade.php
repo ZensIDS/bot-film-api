@@ -32,7 +32,7 @@
         /* Sidebar drawer di mobile: default disembunyikan di luar layar (kiri),
            lalu digeser masuk saat kelas .sidebar-open ditambahkan ke <body>. */
         #admin-sidebar{
-            transition: transform .25s ease;
+            transition: transform .25s ease, width .2s ease;
         }
         @media (max-width: 767px){
             #admin-sidebar{
@@ -55,11 +55,83 @@
                 z-index: 40;
             }
         }
+
+        /* Mode collapse khusus desktop: sidebar menyempit jadi kolom ikon saja. */
+        @media (min-width: 768px){
+            .sidebar-label, .sidebar-brand-sub{
+                opacity: 1;
+                white-space: nowrap;
+                transition: opacity .15s ease;
+            }
+            .collapse-toggle{
+                transition: transform .2s ease;
+            }
+            body.sidebar-collapsed #admin-sidebar{
+                width: 76px;
+            }
+            body.sidebar-collapsed .sidebar-label,
+            body.sidebar-collapsed .sidebar-brand-sub{
+                display: none;
+            }
+            body.sidebar-collapsed .sidebar-link{
+                justify-content: center;
+                padding: 10px;
+            }
+            body.sidebar-collapsed .sidebar-link.active{
+                border-left: none;
+                padding: 10px;
+                border: 1px solid rgba(232,177,86,0.35);
+            }
+            body.sidebar-collapsed #sidebar-brand-row{
+                justify-content: center;
+            }
+            body.sidebar-collapsed #sidebar-user-row{
+                justify-content: center;
+            }
+            body.sidebar-collapsed .collapse-toggle{
+                transform: rotate(180deg);
+            }
+            /* Tooltip nama menu saat sidebar collapsed & link di-hover */
+            body.sidebar-collapsed .sidebar-link{
+                position: relative;
+            }
+            body.sidebar-collapsed .sidebar-link:hover .sidebar-tooltip{
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(0);
+            }
+            .sidebar-tooltip{
+                position: absolute;
+                left: calc(100% + 10px);
+                top: 50%;
+                transform: translate(-6px, -50%);
+                background: var(--surface-2);
+                border: 1px solid var(--hairline);
+                color: var(--text);
+                font-size: 12px;
+                font-weight: 600;
+                padding: 6px 10px;
+                border-radius: 8px;
+                white-space: nowrap;
+                opacity: 0;
+                visibility: hidden;
+                transition: all .15s ease;
+                z-index: 60;
+                pointer-events: none;
+            }
+        }
     </style>
 
     @yield('extra_css')
 </head>
 <body class="min-h-screen flex">
+<script>
+    // Terapkan preferensi collapse sesegera mungkin (sebelum sidebar sempat dirender)
+    // supaya tidak ada efek "kedip" melebar-lalu-menyempit saat halaman di-reload.
+    if (window.innerWidth >= 768 && localStorage.getItem('admin_sidebar_collapsed') === '1') {
+        document.body.classList.add('sidebar-collapsed');
+    }
+</script>
 
     <!-- Overlay gelap di belakang sidebar saat dibuka (mobile only) -->
     <div id="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open')"></div>
@@ -67,11 +139,13 @@
     <!-- Sidebar -->
     <aside id="admin-sidebar" class="flex w-60 shrink-0 flex-col bg-[var(--surface)] border-r border-[var(--hairline)] min-h-screen md:sticky md:top-0">
         <div class="px-5 py-5 border-b border-[var(--hairline)] flex items-center justify-between">
-            <div>
-                <h1 class="font-display text-lg font-semibold text-white">
-                    REEL<span style="color:var(--gold)">GATE</span>
-                </h1>
-                <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mt-0.5">Admin Panel</p>
+            <div id="sidebar-brand-row" class="flex items-center gap-2 min-w-0">
+                <div class="min-w-0">
+                    <h1 class="font-display text-lg font-semibold text-white whitespace-nowrap">
+                        REEL<span style="color:var(--gold)">GATE</span>
+                    </h1>
+                    <p class="sidebar-brand-sub text-[10px] text-[var(--text-muted)] uppercase tracking-wide mt-0.5">Admin Panel</p>
+                </div>
             </div>
             <button type="button" class="md:hidden text-[var(--text-muted)] text-xl leading-none px-1"
                 onclick="document.body.classList.remove('sidebar-open')" aria-label="Tutup menu">✕</button>
@@ -79,38 +153,52 @@
 
         <nav class="flex-1 px-3 py-4 space-y-1">
             <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <span>🏠</span> Dashboard
+                <span>🏠</span> <span class="sidebar-label">Dashboard</span>
+                <span class="sidebar-tooltip">Dashboard</span>
             </a>
             <a href="{{ route('admin.movies.index') }}" class="sidebar-link {{ request()->routeIs('admin.movies.*') ? 'active' : '' }}">
-                <span>🎬</span> Manajemen Film
+                <span>🎬</span> <span class="sidebar-label">Manajemen Film</span>
+                <span class="sidebar-tooltip">Manajemen Film</span>
             </a>
             <a href="{{ route('admin.packages.index') }}" class="sidebar-link {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}">
-                <span>💎</span> Paket & Harga
+                <span>💎</span> <span class="sidebar-label">Paket & Harga</span>
+                <span class="sidebar-tooltip">Paket & Harga</span>
             </a>
             <a href="{{ route('admin.users.index') }}" class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                <span>👤</span> User & Langganan
+                <span>👤</span> <span class="sidebar-label">User & Langganan</span>
+                <span class="sidebar-tooltip">User & Langganan</span>
             </a>
             <a href="{{ route('admin.transactions.index') }}" class="sidebar-link {{ request()->routeIs('admin.transactions.*') ? 'active' : '' }}">
-                <span>💳</span> Riwayat Transaksi
+                <span>💳</span> <span class="sidebar-label">Riwayat Transaksi</span>
+                <span class="sidebar-tooltip">Riwayat Transaksi</span>
             </a>
             <a href="{{ route('admin.movie-requests.index') }}" class="sidebar-link {{ request()->routeIs('admin.movie-requests.*') ? 'active' : '' }}">
-                <span>📥</span> Request Film
+                <span>📥</span> <span class="sidebar-label">Request Film</span>
+                <span class="sidebar-tooltip">Request Film</span>
             </a>
         </nav>
 
+        <div class="px-3 py-3 border-t border-[var(--hairline)]">
+            <button type="button" onclick="toggleSidebarCollapse()"
+                class="hidden md:flex w-full items-center justify-center gap-2 text-[var(--text-muted)] hover:text-[var(--gold-soft)] hover:bg-[var(--surface-2)] transition rounded-lg py-2 text-xs font-semibold">
+                <span class="collapse-toggle">⇤</span>
+                <span class="sidebar-label">Tutup Sidebar</span>
+            </button>
+        </div>
+
         <div class="px-3 py-4 border-t border-[var(--hairline)]">
-            <div class="flex items-center gap-2.5 px-2 mb-3">
-                <div class="w-8 h-8 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-xs font-bold text-[var(--gold-soft)]">
+            <div id="sidebar-user-row" class="flex items-center gap-2.5 px-2 mb-3">
+                <div class="w-8 h-8 shrink-0 rounded-full bg-[var(--surface-2)] flex items-center justify-center text-xs font-bold text-[var(--gold-soft)]">
                     {{ strtoupper(substr(Auth::guard('admin')->user()->name, 0, 1)) }}
                 </div>
-                <div class="min-w-0">
+                <div class="min-w-0 sidebar-label">
                     <p class="text-xs font-semibold text-white truncate">{{ Auth::guard('admin')->user()->name }}</p>
                 </div>
             </div>
             <form action="{{ route('admin.logout') }}" method="POST">
                 @csrf
-                <button type="submit" class="w-full text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--crimson)] transition text-left px-2 py-1.5">
-                    ⎋ Keluar
+                <button type="submit" class="w-full flex items-center gap-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--crimson)] transition px-2 py-1.5 md:justify-start justify-center">
+                    <span>⎋</span><span class="sidebar-label">Keluar</span>
                 </button>
             </form>
         </div>
@@ -158,6 +246,13 @@
             document.body.classList.remove('sidebar-open');
         });
     });
+
+    // Mode collapse sidebar (khusus desktop): preferensi disimpan di localStorage
+    // supaya tetap collapsed/expanded walau halaman di-reload atau pindah menu.
+    function toggleSidebarCollapse() {
+        document.body.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('admin_sidebar_collapsed', document.body.classList.contains('sidebar-collapsed') ? '1' : '0');
+    }
 </script>
 </body>
 </html>

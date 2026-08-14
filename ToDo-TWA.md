@@ -108,6 +108,7 @@
 
 - [x] Penambahan Notifikasi Ketika Request FIlm
 - [x] Hilangkan proses compress file saat up video di bot (Jika Bisa)
+- [ ] Desain Dashboard yang informatif disertai dengan shortcut informasi penting dan grafik grafik
 - [ ] Buat tampilan admin agar menjadi responsive di HP
 - [ ] Perubahan Color Pallete & Insert Logo TWA
 - [ ] Custom tampilan pada bot agar lebih menarik
