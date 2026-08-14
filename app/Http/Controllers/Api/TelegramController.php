@@ -175,6 +175,7 @@ class TelegramController extends Controller
                         . "Silakan pilih menu di bawah ini untuk memulai:";
 
                     // Tombol inline yang menempel langsung di pesan /start.
+                    // Disusun 2 tombol per baris (bukan 1 tombol per baris) supaya lebih ringkas.
                     $keyboard = [
                         'inline_keyboard' => [
                             [
@@ -184,7 +185,7 @@ class TelegramController extends Controller
                             [
                                 ['text' => '🎥 REQUEST FILM', 'web_app' => ['url' => $this->webAppUrl('/request-film')]],
                                 ['text' => '📦 PILIH PAKET', 'web_app' => ['url' => $this->webAppUrl('/app?tab=packages')]]
-                            ],
+                            ]
                         ]
                     ];
 
