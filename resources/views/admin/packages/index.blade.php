@@ -30,9 +30,9 @@
             @forelse ($packages as $package)
                 <tr class="border-b border-[var(--hairline)] last:border-0 hover:bg-[var(--surface-2)]/40">
                     <td class="px-5 py-3">
-                        <p class="font-semibold text-[var(--text)]">{{ $package->name }}</p>
+                        <p class="font-semibold text-white">{{ $package->name }}</p>
                         @if ($package->is_featured)
-                            <span class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--gold)] text-white uppercase tracking-wide">🔥 Paling Laris</span>
+                            <span class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--gold)] text-black uppercase tracking-wide">🔥 Paling Laris</span>
                         @endif
                     </td>
                     <td class="px-5 py-3 text-[var(--text-muted)]">{{ $package->duration_days }} Hari</td>
@@ -63,7 +63,7 @@
 
                             <form action="{{ route('admin.packages.toggle-active', $package) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--gold)] whitespace-nowrap">
+                                <button type="submit" class="text-xs font-semibold text-[var(--text-muted)] hover:text-white whitespace-nowrap">
                                     {{ $package->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                 </button>
                             </form>
@@ -86,7 +86,7 @@
 
                             <button type="button"
                                 onclick="openDeletePackageModal('{{ route('admin.packages.destroy', $package) }}', {{ Illuminate\Support\Js::from($package->name) }})"
-                                class="text-xs font-semibold text-[var(--crimson)] hover:text-[var(--crimson)] whitespace-nowrap">
+                                class="text-xs font-semibold text-[var(--crimson)] hover:text-[#F27C97] whitespace-nowrap">
                                 Hapus
                             </button>
                         </div>
@@ -106,7 +106,7 @@
 <!-- ===================== Modal: Tambah / Edit Paket ===================== -->
 <div id="packageModalBackdrop" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl w-full max-w-sm p-6 shadow-2xl">
-        <h3 id="packageModalTitle" class="font-display text-lg font-semibold text-[var(--text)] mb-5">Tambah Paket</h3>
+        <h3 id="packageModalTitle" class="font-display text-lg font-semibold text-white mb-5">Tambah Paket</h3>
 
         <form id="packageForm" method="POST" action="{{ route('admin.packages.store') }}">
             @csrf
@@ -115,18 +115,18 @@
             <label class="block text-xs font-semibold text-[var(--text-muted)] mb-2">Nama Paket</label>
             <input type="text" name="name" id="packageName" required maxlength="255"
                 placeholder="mis. Paket Bulanan (30 Hari)"
-                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-[var(--text)] mb-4 focus:outline-none focus:border-[var(--gold)]">
+                class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-white mb-4 focus:outline-none focus:border-[var(--gold)]">
 
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div>
                     <label class="block text-xs font-semibold text-[var(--text-muted)] mb-2">Durasi (Hari)</label>
                     <input type="number" name="duration_days" id="packageDuration" required min="1" max="3650" value="30"
-                        class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:border-[var(--gold)]">
+                        class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--gold)]">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-[var(--text-muted)] mb-2">Harga (Rp)</label>
                     <input type="number" name="price" id="packagePrice" required min="0" step="100" value="10000"
-                        class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-[var(--text)] focus:outline-none focus:border-[var(--gold)]">
+                        class="w-full bg-[var(--surface-2)] border border-[var(--hairline)] rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-[var(--gold)]">
                 </div>
             </div>
 
@@ -144,7 +144,7 @@
 
             <div class="flex items-center justify-end gap-3">
                 <button type="button" onclick="closePackageModal()"
-                    class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-[var(--gold)]">
+                    class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-white">
                     Batal
                 </button>
                 <button type="submit" id="packageSubmitBtn"
@@ -159,12 +159,12 @@
 <!-- ===================== Modal: Confirm Hapus Paket ===================== -->
 <div id="deletePackageModalBackdrop" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="bg-[var(--surface)] border border-[var(--hairline)] rounded-2xl w-full max-w-sm p-6 shadow-2xl">
-        <div class="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center text-xl mb-4">
+        <div class="w-11 h-11 rounded-full bg-red-900/30 flex items-center justify-center text-xl mb-4">
             ⚠️
         </div>
-        <h3 class="font-display text-lg font-semibold text-[var(--text)] mb-1">Hapus Paket?</h3>
+        <h3 class="font-display text-lg font-semibold text-white mb-1">Hapus Paket?</h3>
         <p class="text-sm text-[var(--text-muted)] mb-6">
-            Paket <span id="deletePackageName" class="text-[var(--text)] font-semibold">—</span> akan dihapus permanen dan tidak bisa dikembalikan. Paket yang sudah pernah dipakai transaksi tidak bisa dihapus — nonaktifkan saja.
+            Paket <span id="deletePackageName" class="text-white font-semibold">—</span> akan dihapus permanen dan tidak bisa dikembalikan. Paket yang sudah pernah dipakai transaksi tidak bisa dihapus — nonaktifkan saja.
         </p>
 
         <form id="deletePackageForm" method="POST" action="">
@@ -172,7 +172,7 @@
             @method('DELETE')
             <div class="flex items-center justify-end gap-3">
                 <button type="button" onclick="closeDeletePackageModal()"
-                    class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-[var(--gold)]">
+                    class="text-xs font-semibold px-4 py-2 rounded-xl bg-[var(--surface-2)] text-[var(--text)] hover:text-white">
                     Batal
                 </button>
                 <button type="submit"

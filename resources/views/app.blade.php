@@ -17,15 +17,15 @@
 
     <style>
         :root{
-            --bg: #FFFFFF;
-            --surface: #EFF5FC;
-            --surface-2: #DCEAFC;
-            --gold: #3A94FF;
-            --gold-soft: #2184E2;
+            --bg: #0B0910;
+            --surface: #16131F;
+            --surface-2: #1E1930;
+            --gold: #E8B156;
+            --gold-soft: #F3D08A;
             --crimson: #C2355A;
-            --text: #2D3647;
-            --text-muted: #5C7A99;
-            --hairline: rgba(31,78,127,0.15);
+            --text: #EDE9F5;
+            --text-muted: #9C93AF;
+            --hairline: rgba(232,177,86,0.16);
         }
 
         html, body {
@@ -40,7 +40,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-image:
                 radial-gradient(ellipse 60% 40% at 50% -10%, rgba(194,53,90,0.20), transparent 60%),
-                radial-gradient(ellipse 50% 35% at 90% 10%, rgba(58,148,255,0.10), transparent 60%);
+                radial-gradient(ellipse 50% 35% at 90% 10%, rgba(232,177,86,0.10), transparent 60%);
         }
 
         .font-display{ font-family: 'Fraunces', serif; }
@@ -76,7 +76,7 @@
             position: absolute;
             inset: -20% 0 auto 0;
             height: 180px;
-            background: conic-gradient(from 200deg at 50% 0%, transparent, rgba(58,148,255,0.25), transparent 40%);
+            background: conic-gradient(from 200deg at 50% 0%, transparent, rgba(232,177,86,0.25), transparent 40%);
             filter: blur(8px);
             pointer-events: none;
             animation: sweep 6s ease-in-out infinite;
@@ -105,13 +105,13 @@
         .poster__frame::after{
             content:"";
             position:absolute; inset:0;
-            background: linear-gradient(180deg, transparent 40%, rgba(31,78,127,0.92) 100%);
+            background: linear-gradient(180deg, transparent 40%, rgba(11,9,16,0.92) 100%);
         }
         .poster__badge{
             position:absolute; top:8px; left:8px; z-index:2;
             font-size: 10px; letter-spacing:.06em; font-weight:700;
             padding: 3px 8px; border-radius: 999px;
-            background: rgba(31,78,127,0.7); border:1px solid var(--hairline);
+            background: rgba(11,9,16,0.7); border:1px solid var(--hairline);
             color: var(--gold-soft);
             backdrop-filter: blur(4px);
         }
@@ -124,8 +124,8 @@
         .badge-vip{
             position: relative;
             overflow: hidden;
-            background: linear-gradient(90deg, #123A5C, var(--gold), #123A5C);
-            color: #EAF2FF;
+            background: linear-gradient(90deg, #8A5B18, var(--gold), #8A5B18);
+            color: #1A1408;
         }
         .badge-vip::after{
             content:"";
@@ -144,7 +144,7 @@
         .btn-ticket{
             position: relative;
             background: linear-gradient(180deg, var(--gold-soft), var(--gold));
-            color: #EAF2FF;
+            color: #241705;
         }
         .btn-ticket::before, .btn-ticket::after{
             content:"";
@@ -242,7 +242,7 @@
 
                         <!-- Filter Chips -->
                         <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
-                            <button onclick="setGenreFilter('Semua', this)" class="genre-chip px-3.5 py-1.5 rounded-full bg-[var(--gold)] text-white font-semibold whitespace-nowrap transition">Semua</button>
+                            <button onclick="setGenreFilter('Semua', this)" class="genre-chip px-3.5 py-1.5 rounded-full bg-[var(--gold)] text-black font-semibold whitespace-nowrap transition">Semua</button>
                             <button onclick="setGenreFilter('Romansa', this)" class="genre-chip px-3.5 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--hairline)] text-[var(--text-muted)] whitespace-nowrap transition">Romansa</button>
                             <button onclick="setGenreFilter('Misteri', this)" class="genre-chip px-3.5 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--hairline)] text-[var(--text-muted)] whitespace-nowrap transition">Misteri</button>
                             <button onclick="setGenreFilter('Drama Kerajaan', this)" class="genre-chip px-3.5 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--hairline)] text-[var(--text-muted)] whitespace-nowrap transition">Kerajaan</button>
@@ -251,10 +251,10 @@
                     </div>
 
                     <!-- Lock Paywall Banner -->
-                    <div id="home-paywall-notice" class="hidden rounded-xl p-4 mb-6 text-center bg-gradient-to-r from-red-50 to-purple-50 border border-[var(--crimson)]">
+                    <div id="home-paywall-notice" class="hidden rounded-xl p-4 mb-6 text-center bg-gradient-to-r from-red-900/30 to-purple-900/30 border border-[var(--crimson)]">
                         <p class="text-xs text-[var(--gold-soft)] font-semibold mb-1">🔒 Mode Pratinjau Terbatas</p>
                         <p class="text-[11px] text-[var(--text-muted)] mb-3">Berlangganan sekarang untuk membuka kunci streaming full episode HD.</p>
-                        <button onclick="switchTab('packages')" class="text-xs bg-[var(--gold)] text-white font-bold px-4 py-1.5 rounded-lg">Beli Paket VIP</button>
+                        <button onclick="switchTab('packages')" class="text-xs bg-[var(--gold)] text-black font-bold px-4 py-1.5 rounded-lg">Beli Paket VIP</button>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4" id="drama-list"><!-- diisi oleh JS --></div>
@@ -404,7 +404,7 @@
         document.querySelectorAll('.genre-chip').forEach(btn => {
             btn.className = "genre-chip px-3.5 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--hairline)] text-[var(--text-muted)] whitespace-nowrap transition";
         });
-        btnElement.className = "genre-chip px-3.5 py-1.5 rounded-full bg-[var(--gold)] text-white font-semibold whitespace-nowrap transition";
+        btnElement.className = "genre-chip px-3.5 py-1.5 rounded-full bg-[var(--gold)] text-black font-semibold whitespace-nowrap transition";
         handleSearchFilter();
     }
 
@@ -448,7 +448,7 @@
 
             return `
                 <div class="${isFeatured ? 'bg-[var(--surface-2)] border border-[var(--gold)]' : 'bg-[var(--surface)] border border-[var(--hairline)]'} rounded-xl px-4 py-3 flex items-center justify-between gap-3 relative">
-                    ${isFeatured ? '<span class="absolute -top-2 right-3 bg-[var(--gold)] text-white font-bold text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider">Paling Laris</span>' : ''}
+                    ${isFeatured ? '<span class="absolute -top-2 right-3 bg-[var(--gold)] text-black font-bold text-[8px] px-2 py-0.5 rounded-full uppercase tracking-wider">Paling Laris</span>' : ''}
                     <div class="min-w-0">
                         <h3 class="text-sm font-semibold ${isFeatured ? 'text-[var(--gold)]' : 'text-[var(--text)]'} truncate">${pkg.name}</h3>
                         <p class="text-[11px] text-[var(--text-muted)]">${pkg.duration_days} Hari • <span class="font-semibold text-[var(--text)]">${priceFormatted}</span></p>
