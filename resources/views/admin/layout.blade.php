@@ -83,6 +83,9 @@
                 border: 1px solid rgba(232,177,86,0.35);
             }
             body.sidebar-collapsed #sidebar-brand-row{
+                display: none;
+            }
+            body.sidebar-collapsed aside#admin-sidebar > div:first-child{
                 justify-content: center;
             }
             body.sidebar-collapsed #sidebar-user-row{
@@ -147,6 +150,8 @@
                     <p class="sidebar-brand-sub text-[10px] text-[var(--text-muted)] uppercase tracking-wide mt-0.5">Admin Panel</p>
                 </div>
             </div>
+            <button type="button" onclick="toggleSidebarCollapse()" aria-label="Tutup/buka sidebar"
+                class="collapse-toggle hidden md:flex items-center justify-center w-6 h-6 shrink-0 rounded-md text-[var(--text-muted)] hover:text-[var(--gold-soft)] hover:bg-[var(--surface-2)] transition text-sm">⇤</button>
             <button type="button" class="md:hidden text-[var(--text-muted)] text-xl leading-none px-1"
                 onclick="document.body.classList.remove('sidebar-open')" aria-label="Tutup menu">✕</button>
         </div>
@@ -177,14 +182,6 @@
                 <span class="sidebar-tooltip">Request Film</span>
             </a>
         </nav>
-
-        <div class="px-3 py-3 border-t border-[var(--hairline)]">
-            <button type="button" onclick="toggleSidebarCollapse()"
-                class="hidden md:flex w-full items-center justify-center gap-2 text-[var(--text-muted)] hover:text-[var(--gold-soft)] hover:bg-[var(--surface-2)] transition rounded-lg py-2 text-xs font-semibold">
-                <span class="collapse-toggle">⇤</span>
-                <span class="sidebar-label">Tutup Sidebar</span>
-            </button>
-        </div>
 
         <div class="px-3 py-4 border-t border-[var(--hairline)]">
             <div id="sidebar-user-row" class="flex items-center gap-2.5 px-2 mb-3">

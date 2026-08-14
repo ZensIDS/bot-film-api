@@ -49,6 +49,32 @@ class SetTelegramWebhook extends Command
 
         $this->info('Webhook berhasil di-set: ' . $response->body());
 
+        // Set juga "menu button" (tombol di sebelah ikon emoji, sisi kiri kolom ketik) supaya
+        // langsung mengarah ke home TWA (REELGATE). Ini berlaku global untuk semua chat privat
+        // dengan bot (tanpa parameter chat_id), beda dari reply keyboard bawah yang dikirim
+        // per-chat lewat pesan bot.
+        $webAppUrl = config('services.telegram.webapp_url');
+
+        if (!$webAppUrl) {
+            $this->warn('TELEGRAM_WEBAPP_URL belum diset, menu button dilewati.');
+            return self::SUCCESS;
+        }
+
+        $menuButtonResponse = Http::post("https://api.telegram.org/bot{$token}/setChatMenuButton", [
+            'menu_button' => json_encode([
+                'type' => 'web_app',
+                'text' => 'REELGATE',
+                'web_app' => ['url' => rtrim($webAppUrl, '/') . '/app'],
+            ]),
+        ]);
+
+        if ($menuButtonResponse->failed()) {
+            $this->error('Gagal set menu button: ' . $menuButtonResponse->body());
+            return self::FAILURE;
+        }
+
+        $this->info('Menu button berhasil di-set: ' . $menuButtonResponse->body());
+
         return self::SUCCESS;
     }
 }

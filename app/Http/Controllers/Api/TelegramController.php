@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Log;
 
 class TelegramController extends Controller
 {
+    // Label tombol "STATUS LANGGANAN" di reply keyboard bawah. Ditaruh jadi konstanta
+    // supaya label di sendPersistentMenu() dan pengecekan teksnya di handleWebhook()
+    // dijamin selalu sama persis (Telegram mengirim balik teks tombol apa adanya).
+    private const BTN_STATUS = '📊 STATUS LANGGANAN';
+
     public function handleWebhook(Request $request)
     {
         try {
@@ -169,24 +174,36 @@ class TelegramController extends Controller
                         . "Nikmati akses streaming berbagai drama & film eksklusif pilihan.\n\n"
                         . "Silakan pilih menu di bawah ini untuk memulai:";
 
-                    $webAppUrl = rtrim(config('services.telegram.webapp_url'), '/') . '/app';
-
+                    // Tombol inline yang menempel langsung di pesan /start.
                     $keyboard = [
                         'inline_keyboard' => [
                             [
-                                ['text' => '🎬 REELGATE', 'web_app' => ['url' => $webAppUrl]]
+                                ['text' => '🎬 REELGATE', 'web_app' => ['url' => $this->webAppUrl('/app')]]
                             ],
                             [
                                 ['text' => '📊 Status Langganan', 'callback_data' => 'check_status']
+                            ],
+                            [
+                                ['text' => '🎥 Request Film', 'web_app' => ['url' => $this->webAppUrl('/request-film')]]
+                            ],
+                            [
+                                ['text' => '📦 Lihat Paket', 'web_app' => ['url' => $this->webAppUrl('/app?tab=packages')]]
                             ]
                         ]
                     ];
 
                     $this->sendMessageWithKeyboard($chatId, $replyText, $keyboard);
+
+                    // Selain tombol inline di atas, pasang juga menu persisten di bawah kolom
+                    // ketik (reply keyboard) supaya menu utama selalu bisa diakses tanpa harus
+                    // scroll balik ke pesan /start.
+                    $this->sendPersistentMenu($chatId);
                 }
 
-                // Command /status
-                elseif ($text === '/status') {
+                // Command /status ATAU tombol "STATUS LANGGANAN" di reply keyboard bawah
+                // (tombol ini murni tombol teks biasa, bukan web_app, jadi begitu ditekan
+                // Telegram mengirimkannya sebagai pesan teks normal seperti command lain).
+                elseif ($text === '/status' || $text === self::BTN_STATUS) {
                     // Jejak audit: bandingkan chat_id & user_id di sini dengan log "Admin extend VIP"
                     // kalau ada laporan status tidak sinkron antara admin/TWA vs bot.
                     Log::info('Cek status via /status', [
@@ -208,6 +225,11 @@ class TelegramController extends Controller
                 // Command /paket atau /buy
                 elseif ($text === '/paket' || $text === '/buy') {
                     $this->sendPackageList($chatId);
+                }
+
+                // Command /menu buat munculin lagi reply keyboard bawah kalau ke-dismiss user.
+                elseif ($text === '/menu') {
+                    $this->sendPersistentMenu($chatId);
                 }
             }
 
@@ -295,6 +317,54 @@ class TelegramController extends Controller
         }
 
         return $user;
+    }
+
+    /**
+     * Bangun URL absolut ke suatu halaman TWA berdasarkan TELEGRAM_WEBAPP_URL di .env.
+     * $path boleh menyertakan query string sendiri, mis. '/app?tab=packages'.
+     */
+    private function webAppUrl(string $path): string
+    {
+        return rtrim(config('services.telegram.webapp_url'), '/') . $path;
+    }
+
+    /**
+     * Kirim reply keyboard (menu di bawah kolom ketik) berisi 4 menu utama:
+     * REELGATE, STATUS LANGGANAN, REQUEST FILM, LIHAT PAKET.
+     *
+     * PENTING soal tipe tombol di reply keyboard:
+     * - REELGATE, REQUEST FILM, LIHAT PAKET pakai 'web_app' → begitu ditekan, Telegram
+     *   LANGSUNG membuka TWA di URL terkait, TIDAK mengirim pesan teks apa pun ke bot.
+     * - STATUS LANGGANAN sengaja dibuat tombol teks BIASA (tanpa web_app/url), karena
+     *   fiturnya cukup dijawab lewat pesan bot (lihat pengecekan self::BTN_STATUS di
+     *   handleWebhook), bukan lewat halaman TWA.
+     *
+     * Keyboard ini persisten: sekali terkirim (reply_markup ResizeKeyboard), Telegram akan
+     * terus menampilkannya di bawah kolom ketik user sampai bot mengirim ReplyKeyboardRemove
+     * atau user menutupnya manual.
+     */
+    private function sendPersistentMenu($chatId): void
+    {
+        $keyboard = [
+            'keyboard' => [
+                [
+                    ['text' => '🎬 REELGATE', 'web_app' => ['url' => $this->webAppUrl('/app')]],
+                    ['text' => self::BTN_STATUS],
+                ],
+                [
+                    ['text' => '🎥 REQUEST FILM', 'web_app' => ['url' => $this->webAppUrl('/request-film')]],
+                    ['text' => '📦 LIHAT PAKET', 'web_app' => ['url' => $this->webAppUrl('/app?tab=packages')]],
+                ],
+            ],
+            'resize_keyboard' => true,
+            'is_persistent' => true,
+        ];
+
+        $this->sendMessageWithKeyboard(
+            $chatId,
+            'Gunakan menu cepat di bawah ini untuk navigasi 👇',
+            $keyboard
+        );
     }
 
     private function sendPackageList($chatId)
