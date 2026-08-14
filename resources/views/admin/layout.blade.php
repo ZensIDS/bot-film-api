@@ -28,19 +28,53 @@
 
         ::-webkit-scrollbar{ width: 8px; height: 8px; }
         ::-webkit-scrollbar-thumb{ background: var(--surface-2); border-radius: 999px; }
+
+        /* Sidebar drawer di mobile: default disembunyikan di luar layar (kiri),
+           lalu digeser masuk saat kelas .sidebar-open ditambahkan ke <body>. */
+        #admin-sidebar{
+            transition: transform .25s ease;
+        }
+        @media (max-width: 767px){
+            #admin-sidebar{
+                position: fixed;
+                inset: 0 auto 0 0;
+                z-index: 50;
+                transform: translateX(-100%);
+            }
+            body.sidebar-open #admin-sidebar{
+                transform: translateX(0);
+            }
+            #sidebar-overlay{
+                display: none;
+            }
+            body.sidebar-open #sidebar-overlay{
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 40;
+            }
+        }
     </style>
 
     @yield('extra_css')
 </head>
 <body class="min-h-screen flex">
 
+    <!-- Overlay gelap di belakang sidebar saat dibuka (mobile only) -->
+    <div id="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open')"></div>
+
     <!-- Sidebar -->
-    <aside class="hidden md:flex w-60 shrink-0 flex-col bg-[var(--surface)] border-r border-[var(--hairline)] min-h-screen sticky top-0">
-        <div class="px-5 py-5 border-b border-[var(--hairline)]">
-            <h1 class="font-display text-lg font-semibold text-white">
-                REEL<span style="color:var(--gold)">GATE</span>
-            </h1>
-            <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mt-0.5">Admin Panel</p>
+    <aside id="admin-sidebar" class="flex w-60 shrink-0 flex-col bg-[var(--surface)] border-r border-[var(--hairline)] min-h-screen md:sticky md:top-0">
+        <div class="px-5 py-5 border-b border-[var(--hairline)] flex items-center justify-between">
+            <div>
+                <h1 class="font-display text-lg font-semibold text-white">
+                    REEL<span style="color:var(--gold)">GATE</span>
+                </h1>
+                <p class="text-[10px] text-[var(--text-muted)] uppercase tracking-wide mt-0.5">Admin Panel</p>
+            </div>
+            <button type="button" class="md:hidden text-[var(--text-muted)] text-xl leading-none px-1"
+                onclick="document.body.classList.remove('sidebar-open')" aria-label="Tutup menu">✕</button>
         </div>
 
         <nav class="flex-1 px-3 py-4 space-y-1">
@@ -85,7 +119,11 @@
     <!-- Main content -->
     <div class="flex-1 min-w-0">
         <header class="md:hidden flex items-center justify-between px-4 py-3 bg-[var(--surface)] border-b border-[var(--hairline)]">
-            <h1 class="font-display text-base font-semibold text-white">REEL<span style="color:var(--gold)">GATE</span></h1>
+            <div class="flex items-center gap-3">
+                <button type="button" class="text-[var(--text)] text-xl leading-none px-1"
+                    onclick="document.body.classList.add('sidebar-open')" aria-label="Buka menu">☰</button>
+                <h1 class="font-display text-base font-semibold text-white">REEL<span style="color:var(--gold)">GATE</span></h1>
+            </div>
             <form action="{{ route('admin.logout') }}" method="POST">
                 @csrf
                 <button type="submit" class="text-xs text-[var(--text-muted)]">Keluar</button>
@@ -111,5 +149,15 @@
     </div>
 
 @yield('extra_js')
+
+<script>
+    // Auto-tutup sidebar drawer begitu salah satu link menu diklik (khusus mobile),
+    // supaya admin tidak perlu tap ✕ manual sebelum lanjut ke halaman baru.
+    document.querySelectorAll('#admin-sidebar .sidebar-link').forEach(function (link) {
+        link.addEventListener('click', function () {
+            document.body.classList.remove('sidebar-open');
+        });
+    });
+</script>
 </body>
 </html>

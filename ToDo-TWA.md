@@ -106,8 +106,9 @@
 
 ### **Revisi**
 
-- [ ] Penambahan Notifikasi Ketika Request FIlm
-- [ ] Hilangkan proses compress file saat up video di bot (Jika Bisa)
+- [x] Penambahan Notifikasi Ketika Request FIlm
+- [x] Hilangkan proses compress file saat up video di bot (Jika Bisa)
+- [ ] Buat tampilan admin agar menjadi responsive di HP
 - [ ] Perubahan Color Pallete & Insert Logo TWA
 - [ ] Custom tampilan pada bot agar lebih menarik
 - [ ] Pembuatan Shortcut untuk BOT Agar langsung bisa diakses di homepage HP (Jika Bisa)
