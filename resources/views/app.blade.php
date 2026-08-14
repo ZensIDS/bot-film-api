@@ -365,7 +365,9 @@
         addToHomeScreen: () => {},
         checkHomeScreenStatus: () => {},
         onEvent: () => {},
+        isVersionAtLeast: () => false,
         platform: 'unknown',
+        version: '-',
         initDataUnsafe: {}
     };
     tg.ready();
@@ -384,16 +386,36 @@
         const btn = document.getElementById('btn-add-home');
 
         // 'addToHomeScreen' cuma bekerja di client Telegram MOBILE (Android/iOS) — di
-        // Telegram Desktop/Web dia diam-diam tidak melakukan apa-apa (tidak error, tapi
-        // juga tidak ada dialog yang muncul, terlihat seperti tombol "tidak merespons").
-        // tg.platform mengembalikan 'android', 'ios', 'tdesktop', 'weba', 'webk', dst.
+        // Telegram Desktop/Web dia diam-diam tidak melakukan apa-apa. tg.platform
+        // mengembalikan 'android', 'ios', 'tdesktop', 'weba', 'webk', dst.
         const isMobile = tg.platform === 'android' || tg.platform === 'ios';
+        const hasMethod = typeof tg.addToHomeScreen === 'function';
+        // Cek versi WebApp client-nya juga (bukan cuma keberadaan method-nya), karena di
+        // beberapa versi Telegram Android yang lebih lama, method ini SUDAH ADA di objek
+        // JS-nya tapi diam-diam tidak melakukan apa pun saat dipanggil (event-nya di-ignore
+        // oleh aplikasi native). Ini persis gejala "diklik tapi tidak ada respons apa pun".
+        const versionOk = typeof tg.isVersionAtLeast === 'function' ? tg.isVersionAtLeast('8.0') : true;
 
-        if (typeof tg.addToHomeScreen !== 'function' || !isMobile) {
-            return;
+        console.log('[AddToHomeScreen debug]', {
+            platform: tg.platform, version: tg.version, hasMethod, versionOk
+        });
+
+        if (!hasMethod || !isMobile) {
+            return; // bukan mobile / SDK terlalu lama sekali → sembunyikan total
         }
 
         btn.classList.remove('hidden');
+
+        if (!versionOk) {
+            // Method-nya ADA tapi versi client kemungkinan belum benar-benar mendukungnya.
+            // Daripada tombol terlihat "hidup" tapi diam saat ditekan, tombol dibuat terlihat
+            // nonaktif dan menjelaskan kenapa, sekaligus kasih info versi buat debugging.
+            btn.classList.add('opacity-60');
+            btn.onclick = () => tg.showAlert(
+                `Fitur ini butuh Telegram versi terbaru (Bot API 8.0+). Update aplikasi Telegram-mu dari Play Store, lalu buka lagi menu ini.\n\nVersi terdeteksi: ${tg.version || '-'}`
+            );
+            return;
+        }
 
         // Kalau tersedia, cek dulu status pin-nya (Bot API 8.0+) supaya tombol bisa
         // disembunyikan/diubah teksnya kalau ternyata sudah pernah ditambahkan sebelumnya.
